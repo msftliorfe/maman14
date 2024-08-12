@@ -1,13 +1,13 @@
 #include "file_manager.h"
 
 /**
- * initialize_file_manager - 
+ * initialize_file_manager -
  * Initializes the FileManager structure.
  *
  * @param manager Pointer to the FileManager structure to be initialized.
  */
 void initialize_file_manager(FileManager* manager) {
- 	/* Set the post_macro pointer to NULL, indicating no macro has been processed yet. */
+	/* Set the post_macro pointer to NULL, indicating no macro has been processed yet. */
 	manager->post_macro = NULL;
 	/* Initialize the row count to 0, meaning no rows have been processed yet. */
 	manager->row_count = 0;
@@ -15,14 +15,14 @@ void initialize_file_manager(FileManager* manager) {
 }
 
 /**
- * free_file_manager - 
+ * free_file_manager -
  * Frees the memory allocated for the FileManager structure.
  *
  * @param manager Pointer to the FileManager structure whose memory is to be freed.
  */
 void free_file_manager(FileManager* manager) {
 	int i, j;
-	 /* Iterate over each row in the post_macro array. */
+	/* Iterate over each row in the post_macro array. */
 	for (i = 0; i < manager->row_count; ++i) {
 		/* Iterate over each string in the current row and free it. */
 		for (j = 0; manager->post_macro[i][j] != NULL; ++j) {
@@ -36,7 +36,7 @@ void free_file_manager(FileManager* manager) {
 }
 
 /**
- *input_process - 
+ *input_process -
  *Processes the input file and updates the FileManager with the processed lines.
  *
  *@param fileManager A pointer to the FileManager structure that will be updated with
@@ -49,21 +49,21 @@ void free_file_manager(FileManager* manager) {
  */
 int input_process(FileManager* fileManager, MacroManager* macroManager, char* file_path) {
 	int i, split_count, len;
-	char** split_line; 
+	char** split_line;
 	char line[MAX_LINE_LENGTH];
-	char *new_file_path;
+	char* new_file_path;
 
 	/*Concatenate extension string to the name of the file*/
 	len = strlen(file_path) + strlen(INPUT_FILE_EXTENSION) + 1;
-    new_file_path = malloc(len);
+	new_file_path = malloc(len);
 
-    if (new_file_path == NULL) {
-        LOG_ERROR("Failed to allocate memory");
-        return NOT_FOUND;
-    }
+	if (new_file_path == NULL) {
+		LOG_ERROR("Failed to allocate memory");
+		return NOT_FOUND;
+	}
 
-    strcpy(new_file_path, file_path);
-    strcat(new_file_path, INPUT_FILE_EXTENSION);
+	strcpy(new_file_path, file_path);
+	strcat(new_file_path, INPUT_FILE_EXTENSION);
 
 	/* Open the specified file for reading*/
 	FILE* file = fopen(new_file_path, "r");
@@ -77,7 +77,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 	while (fgets(line, sizeof(line), file)) {
 		/* Remove newline character from the end of the line*/
 		line[strcspn(line, "\n")] = '\0';
-		
+
 		/* Split the line into tokens using whitespace as delimiters */
 		split_line = split_string(line);
 
@@ -94,7 +94,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 			/* Iterate over each row of the processed macro content */
 			for (i = 0; processed_lines[i] != NULL; i++) {
 				char** row = processed_lines[i];  /* Each row is an array of strings (char**) */
-	
+
 				/* Reallocate memory for the post_macro array to include the new row */
 				fileManager->post_macro = realloc(fileManager->post_macro, (fileManager->row_count + 1) * sizeof(char**));
 				if (fileManager->post_macro == NULL) {
@@ -114,10 +114,10 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 			char** processed_line = process_file_line(macroManager, split_line, split_count);
 			if (processed_line != NULL) {
 
-                /* Reallocate memory for the post_macro array to include the new line */
+				/* Reallocate memory for the post_macro array to include the new line */
 				fileManager->post_macro = realloc(fileManager->post_macro, (fileManager->row_count + 1) * sizeof(char**));
 				if (fileManager->post_macro == NULL) {
-                    /* Handle memory allocation failure by logging an error message and exit */
+					/* Handle memory allocation failure by logging an error message and exit */
 					LOG_ERROR("Memory allocation failed");
 					return NOT_FOUND;
 				}
@@ -137,7 +137,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 		}
 		free(split_line);
 	}
-    /* Close the file after processing */
+	/* Close the file after processing */
 	fclose(file);
 	return FOUND;
 }
@@ -190,6 +190,76 @@ void print_post_macro(FileManager* manager) {
 		}
 		printf("\n");
 	}
+}
+
+void printPostMacroToFile(char* file_name, const FileManager* fileManager) {
+	int len;
+	int i, j, col, max_columns;
+	char* new_file_path;
+
+	/*Concatenate extension string to the name of the file*/
+	len = strlen(file_name) + strlen(POST_MACRO_FILE_EXTENSION) + 1;
+	new_file_path = malloc(len);
+
+	if (new_file_path == NULL) {
+		LOG_ERROR("Failed to allocate memory");
+		return NOT_FOUND;
+	}
+
+	strcpy(new_file_path, file_name);
+	strcat(new_file_path, POST_MACRO_FILE_EXTENSION);
+	FILE* file = fopen(new_file_path, "w");
+	if (file == NULL) {
+		perror("Failed to open file ps.obj");
+		exit(EXIT_FAILURE);
+	}
+
+	fprintf(file, "post_macro\n");
+	if (fileManager->row_count == 0) {
+		fprintf(file, "No data to display.\n");
+		return;
+	}
+
+	/* Determine the maximum number of columns for proper formatting*/
+	/* depende on input file*/
+	max_columns = 0;
+	for (i = 0; i < fileManager->row_count; ++i) {
+		j = 0;
+		while (fileManager->post_macro[i][j] != NULL) j++;
+		if (j > max_columns) {
+			max_columns = j;
+		}
+	}
+
+	/* Print the table*/
+	fprintf(file, "+");
+	for (col = 0; col < max_columns; ++col) {
+		fprintf(file, "------------+"); /* Adjust the width of columns as needed*/
+	}
+	fprintf(file, "\n");
+
+	for (i = 0; i < fileManager->row_count; ++i) {
+		fprintf(file, "|");
+		for (j = 0; fileManager->post_macro[i][j] != NULL; ++j) {
+			fprintf(file, " %-10s |", fileManager->post_macro[i][j]); /* Adjust the width of columns as needed*/
+		}
+
+		/* Fill the remaining columns with empty spaces if the current row has fewer columns*/
+		for (j = 0; j < max_columns; ++j) {
+			if (fileManager->post_macro[i][j] == NULL) {
+				fprintf(file, " %-10s |", "");
+			}
+		}
+		fprintf(file, "\n");
+
+		/* Print the row separator*/
+		fprintf(file, "+");
+		for (col = 0; col < max_columns; ++col) {
+			fprintf(file, "------------+"); /* Adjust the width of columns as needed*/
+		}
+		fprintf(file, "\n");
+	}
+
 }
 
 

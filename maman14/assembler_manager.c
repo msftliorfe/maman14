@@ -62,7 +62,7 @@ void processActionLine(char** line, AssemblerManager* assemblerManager) {
 	int source_reg_num, dest_reg_num, number, location_of_current_operand;
 	char* line_to_add;
 
-	
+
 	addActionItem(assemblerManager, line[0], assemblerManager->IC, first_line);
 	if (has_source_operands) { /* there are source_operands for this action*/
 		AddressingType	addressing_type_source = get_addressing_type(line[1]);
@@ -177,7 +177,7 @@ void printItems(const Item* items, int itemCount, int includeMetadata) {
 	if (includeMetadata) {
 		printf("| Location | Value           | Metadata    | Octal |\n");
 		printf("|----------|-----------------|-------------|-------|\n");
-		
+
 		for (i = 0; i < itemCount; ++i) {
 			printf("| %8d | %-15s | %-11s | %5s |\n", items[i].location, items[i].value, items[i].metadata ? items[i].metadata : "", items[i].octal);
 		}
@@ -185,7 +185,7 @@ void printItems(const Item* items, int itemCount, int includeMetadata) {
 	else {
 		printf("| Location | Value           | Octal |\n");
 		printf("|----------|-----------------|-------|\n");
-				
+
 		for (i = 0; i < itemCount; ++i) {
 			printf("| %8d | %-15s | %5s |\n", items[i].location, items[i].value, items[i].octal);
 		}
@@ -213,7 +213,7 @@ void updateLocationDataSymbols(const SymbolsManager* symbolsManager, const Assem
 }
 
 void updateDataItemsLocation(const AssemblerManager* manager) {
-	int i;	
+	int i;
 	for (i = 0; i < manager->dataItemCount; ++i) {
 		manager->dataItems[i].location += 100 + manager->IC;
 	}
@@ -257,10 +257,23 @@ void second_scan(FileManager* fileManager, AssemblerManager* assemblerManager, S
 	}
 }
 
-void printObjToFile(const AssemblerManager* assemblerManager) {
-	FILE* file = fopen("ps.obj", "w");
+void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	int i;
+	int len;
+	char* new_file_path;
 
+	/*Concatenate extension string to the name of the file*/
+	len = strlen(file_name) + strlen(OBJECTS_FILE_EXTENSION) + 1;
+	new_file_path = malloc(len);
+
+	if (new_file_path == NULL) {
+		LOG_ERROR("Failed to allocate memory");
+		return NOT_FOUND;
+	}
+
+	strcpy(new_file_path, file_name);
+	strcat(new_file_path, OBJECTS_FILE_EXTENSION);
+	FILE* file = fopen(new_file_path, "w");
 	if (file == NULL) {
 		perror("Failed to open file ps.obj");
 		exit(EXIT_FAILURE);
@@ -282,7 +295,9 @@ void printObjToFile(const AssemblerManager* assemblerManager) {
 	fclose(file);
 }
 
-void printReferenceSymbolsToFile(const SymbolsManager* manager) {
+void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager) {
+	int len;
+	char* new_file_path;
 	FILE* ent_file = NULL;
 	FILE* ext_file = NULL;
 	int ent_has_values = NOT_FOUND;
@@ -293,7 +308,18 @@ void printReferenceSymbolsToFile(const SymbolsManager* manager) {
 		ReferenceSymbol* ref_symbol = &manager->ref_symbols[i];
 		if (ref_symbol->type) {
 			if (!ext_has_values) {
-				ext_file = fopen("ps.ext", "w");
+				/*Concatenate extension string to the name of the file*/
+				len = strlen(file_name) + strlen(EXTERNALS_FILE_EXTENSION) + 1;
+				new_file_path = malloc(len);
+
+				if (new_file_path == NULL) {
+					LOG_ERROR("Failed to allocate memory");
+					return NOT_FOUND;
+				}
+
+				strcpy(new_file_path, file_name);
+				strcat(new_file_path, EXTERNALS_FILE_EXTENSION);
+				ext_file = fopen(new_file_path, "w");
 				if (ext_file == NULL) {
 					perror("Failed to open file ps.ext");
 					exit(EXIT_FAILURE);
@@ -304,7 +330,18 @@ void printReferenceSymbolsToFile(const SymbolsManager* manager) {
 		}
 		else {
 			if (!ent_has_values) {
-				ent_file = fopen("ps.ent", "w");
+				/*Concatenate extension string to the name of the file*/
+				len = strlen(file_name) + strlen(ENTRY_FILE_EXTENSION) + 1;
+				new_file_path = malloc(len);
+
+				if (new_file_path == NULL) {
+					LOG_ERROR("Failed to allocate memory");
+					return NOT_FOUND;
+				}
+
+				strcpy(new_file_path, file_name);
+				strcat(new_file_path, ENTRY_FILE_EXTENSION);
+				ent_file = fopen(new_file_path, "w");
 				if (ent_file == NULL) {
 					perror("Failed to open file ps.ent");
 					exit(EXIT_FAILURE);

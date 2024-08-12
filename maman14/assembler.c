@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
 		{
 			/*Only if reading the file and creating the post-macro file worked, then continue*/
 			print_post_macro(&fileManager);/*ToDo should change to a file not print*/
+			printPostMacroToFile(*argv, &fileManager);
 			//print_post_macro_to_file(&fileManager);
 
 			AssemblerManager* assemblerManager = createAssemblerManager();
@@ -65,8 +66,8 @@ int main(int argc, char** argv) {
 
 			second_scan(&fileManager, assemblerManager, symbolsManager);
 
-			printObjToFile(assemblerManager);
-			printReferenceSymbolsToFile(symbolsManager);
+			printObjToFile(*argv, assemblerManager);
+			printReferenceSymbolsToFile(*argv, symbolsManager);
 		}
 		free_file_manager(&fileManager);
 	}

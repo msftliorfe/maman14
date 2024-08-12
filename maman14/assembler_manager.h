@@ -49,8 +49,8 @@ void printActionItems(const AssemblerManager* manager);
 void updateLocationDataSymbols(const SymbolsManager* symbolsManager, const AssemblerManager* manager);
 void updateDataItemsLocation(const AssemblerManager* manager);
 void second_scan(FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager);
-void printObjToFile(const AssemblerManager* assemblerManager);
-void printReferenceSymbolsToFile(const SymbolsManager* manager);
+void printObjToFile(char* file_name, const AssemblerManager* assemblerManager);
+void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager);
 
 #endif /*ASSEMBLER_MANAGER_H*/
 
