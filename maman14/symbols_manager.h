@@ -27,6 +27,7 @@ typedef struct {
 
 struct SymbolsManager {
 	Symbols* array;
+	int has_symbols_errors;
 	int used;
 	int size;
 	char** ext;
@@ -88,6 +89,8 @@ int isDataPattern(const char* word);
 int isReferencePattern(const char* word);
 
 void updateDataSymbolsLocation(const SymbolsManager* manager, int steps);
+
+int is_symbol_exists(const SymbolsManager* manager, const char* symbol_name);
 
 #endif /* SYMBOLS_MANAGER_H*/
 

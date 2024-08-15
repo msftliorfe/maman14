@@ -1,54 +1,74 @@
 #include "symbols_manager.h"
 
+/**
+ * createSymbolsManager -
+ * Creates and initializes a new SymbolsManager instance.
+ *
+ * This function allocates memory for a new SymbolsManager structure and initializes
+ * its fields, including arrays for symbols, external symbols, entry symbols,
+ * and reference symbols. It sets initial sizes and allocates memory accordingly.
+ * If any memory allocation fails, the function logs an error and returns.
+ *
+ * @return SymbolsManager* A pointer to the newly created and initialized SymbolsManager instance.
+ */
 SymbolsManager* createSymbolsManager() {
 	SymbolsManager* manager = (SymbolsManager*)malloc(sizeof(SymbolsManager));
 	if (manager == NULL) {
-		perror("Failed to create SymbolsManager");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Failed to create SymbolsManager");
+		return NULL;
 	}
 
 	/* Initialize Symbols array*/
+	manager->has_symbols_errors = NOT_FOUND;
 	manager->array = (Symbols*)malloc(5 * sizeof(Symbols)); /* Initial size of 5*/
+	/*Failed to allocate memory for Symbols array*/
 	if (manager->array == NULL) {
-		perror("Failed to allocate memory for Symbols array");
+		LOG_ERROR("Failed to allocate memory for Symbols array");
 		free(manager);
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
+	/*Memory allocation succeeded*/
+	manager->has_symbols_errors = FOUND;
 	manager->used = 0;
 	manager->size = 5;
 
 	/* Initialize ext array*/
 	manager->ext = (char**)malloc(5 * sizeof(char*)); /* Initial size of 5*/
+
+	/*Failed to allocate memory for ext array*/
 	if (manager->ext == NULL) {
-		perror("Failed to allocate memory for ext array");
+		LOG_ERROR("Failed to allocate memory for ext array");
 		free(manager->array);
 		free(manager);
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
 	manager->ext_used = 0;
 	manager->ext_size = 5;
 
 	/* Initialize ent array*/
 	manager->ent = (char**)malloc(5 * sizeof(char*)); /* Initial size of 5*/
+	/*Failed to allocate memory for ent array*/
 	if (manager->ent == NULL) {
-		perror("Failed to allocate memory for ent array");
+		LOG_ERROR("Failed to allocate memory for ent array");
+		manager->has_symbols_errors = NOT_FOUND;
 		free(manager->ext);
 		free(manager->array);
 		free(manager);
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
 	manager->ent_used = 0;
 	manager->ent_size = 5;
 
 	/* Initialize ref_symbols array*/
 	manager->ref_symbols = (ReferenceSymbol*)malloc(5 * sizeof(ReferenceSymbol)); /* Initial size of 5*/
+	/*Failed to allocate memory for ref_symbols array*/
 	if (manager->ref_symbols == NULL) {
-		perror("Failed to allocate memory for ref_symbols array");
+		LOG_ERROR("Failed to allocate memory for ref_symbols array");
 		free(manager->ent);
 		free(manager->ext);
 		free(manager->array);
 		free(manager);
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
 	manager->ref_used = 0;
 	manager->ref_size = 5;
@@ -58,28 +78,34 @@ SymbolsManager* createSymbolsManager() {
 
 
 void addSymbol(SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data) {
-	if (manager->used == manager->size) {
-		Symbols* new_array;
-		manager->size *= 2;
-		new_array = (Symbols*)realloc(manager->array, manager->size * sizeof(Symbols));
-		if (new_array == NULL) {
-			perror("Failed to reallocate memory for Symbols array");
+	if (is_symbol_exists(manager, symbol_name)) {
+		LOG_ERROR("symbol already exists");
+	}
+	else {
+		if (manager->used == manager->size) {
+			Symbols* new_array;
+			manager->size *= 2;
+			new_array = (Symbols*)realloc(manager->array, manager->size * sizeof(Symbols));
+			if (new_array == NULL) {
+				perror("Failed to reallocate memory for Symbols array");
+				free(manager->array);
+				free(manager);
+				exit(EXIT_FAILURE);
+			}
+			manager->array = new_array;
+		}
+		manager->array[manager->used].symbol_name = duplicate_string(symbol_name); /* Make a copy of the string*/
+		if (manager->array[manager->used].symbol_name == NULL) {
+			perror("Failed to duplicate symbol_name");
 			free(manager->array);
 			free(manager);
 			exit(EXIT_FAILURE);
 		}
-		manager->array = new_array;
+		manager->array[manager->used].symbol_location = symbol_location;
+		manager->array[manager->used].is_data = is_data;
+		manager->used++;
 	}
-	manager->array[manager->used].symbol_name = duplicate_string(symbol_name); /* Make a copy of the string*/
-	if (manager->array[manager->used].symbol_name == NULL) {
-		perror("Failed to duplicate symbol_name");
-		free(manager->array);
-		free(manager);
-		exit(EXIT_FAILURE);
-	}
-	manager->array[manager->used].symbol_location = symbol_location;
-	manager->array[manager->used].is_data = is_data;
-	manager->used++;
+
 }
 
 void printSymbols(const SymbolsManager* manager) {
@@ -123,56 +149,70 @@ void destroySymbolsManager(SymbolsManager* manager) {
 
 void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 	if (is_ext) {
-		if (manager->ext_used == manager->ext_size) {
-			char** new_ext;
-			manager->ext_size *= 2;
-			new_ext = (char**)realloc(manager->ext, manager->ext_size * sizeof(char*));
-			if (new_ext == NULL) {
-				perror("Failed to reallocate memory for ext array");
+		if (isRefExtSymbolExists(manager, value)) {
+			LOG_ERROR("symbol already exists");
+			manager->has_symbols_errors = NOT_FOUND;
+		}
+		else {
+			if (manager->ext_used == manager->ext_size) {
+				char** new_ext;
+				manager->ext_size *= 2;
+				new_ext = (char**)realloc(manager->ext, manager->ext_size * sizeof(char*));
+				if (new_ext == NULL) {
+					LOG_ERROR("Failed to reallocate memory for ext array");
+					free(manager->ext);
+					free(manager->array);
+					free(manager->ent);
+					free(manager);
+					return;
+				}
+				manager->ext = new_ext;
+			}
+			manager->ext[manager->ext_used] = duplicate_string(value); /* Make a copy of the string*/
+			if (manager->ext[manager->ext_used] == NULL) {
+				perror("Failed to duplicate value");
 				free(manager->ext);
 				free(manager->array);
 				free(manager->ent);
 				free(manager);
 				exit(EXIT_FAILURE);
 			}
-			manager->ext = new_ext;
+			manager->ext_used++;
 		}
-		manager->ext[manager->ext_used] = duplicate_string(value); /* Make a copy of the string*/
-		if (manager->ext[manager->ext_used] == NULL) {
-			perror("Failed to duplicate value");
-			free(manager->ext);
-			free(manager->array);
-			free(manager->ent);
-			free(manager);
-			exit(EXIT_FAILURE);
-		}
-		manager->ext_used++;
+
 	}
 	else {
-		if (manager->ent_used == manager->ent_size) {
-			char** new_ent; 
-			manager->ent_size *= 2;
-			new_ent = (char**)realloc(manager->ent, manager->ent_size * sizeof(char*));
-			if (new_ent == NULL) {
-				perror("Failed to reallocate memory for ent array");
+		if (isRefEntSymbolExists(manager, value)) {
+			LOG_ERROR("symbol already exists");
+			manager->has_symbols_errors = NOT_FOUND;
+		}
+		else {
+			if (manager->ent_used == manager->ent_size) {
+				char** new_ent;
+				manager->ent_size *= 2;
+				new_ent = (char**)realloc(manager->ent, manager->ent_size * sizeof(char*));
+				if (new_ent == NULL) {
+					perror("Failed to reallocate memory for ent array");
+					free(manager->ent);
+					free(manager->array);
+					free(manager->ext);
+					free(manager);
+					exit(EXIT_FAILURE);
+				}
+				manager->ent = new_ent;
+			}
+			manager->ent[manager->ent_used] = duplicate_string(value); /* Make a copy of the string*/
+			if (manager->ent[manager->ent_used] == NULL) {
+				perror("Failed to duplicate value");
 				free(manager->ent);
 				free(manager->array);
 				free(manager->ext);
 				free(manager);
 				exit(EXIT_FAILURE);
 			}
-			manager->ent = new_ent;
+			manager->ent_used++;
 		}
-		manager->ent[manager->ent_used] = duplicate_string(value); /* Make a copy of the string*/
-		if (manager->ent[manager->ent_used] == NULL) {
-			perror("Failed to duplicate value");
-			free(manager->ent);
-			free(manager->array);
-			free(manager->ext);
-			free(manager);
-			exit(EXIT_FAILURE);
-		}
-		manager->ent_used++;
+
 	}
 }
 
@@ -205,7 +245,7 @@ void updateSymbolsTable(SymbolsManager* symbolsManager, char** line, int locatio
 }
 
 void printExt(const SymbolsManager* manager) {
-	int i;	
+	int i;
 	printf("\n\n");
 	printf("manager->ext\n");
 	printf("| %-20s |\n", "Ext Name");
@@ -240,14 +280,46 @@ int isReferencePattern(const char* word) {
 	return strcmp(word, ".extern") == 0 || strcmp(word, ".entry") == 0;
 }
 
+/**
+ * updateDataSymbolsLocation -
+ * Updates the location of data symbols in the SymbolsManager.
+ *
+ * This function updates the location of symbols in the `SymbolsManager`'s `array` by adding a
+ * certain number of steps to each symbol's location. The update is conditional based on whether
+ * the symbol represents data.
+ * For data symbols, the function adds a base value (100) plus the
+ * specified number of steps to the symbol's current location.
+ *
+ * @param manager A pointer to a SymbolsManager instance that contains the array of symbols to be updated.
+ * If this pointer or the `array` is NULL, the function returns immediately without making any changes.
+ *
+ * @param steps An integer representing the number of steps to be added to the location of data symbols.
+ */
 void updateDataSymbolsLocation(const SymbolsManager* manager, int steps) {
 	int i;
+	/* Check if the manager or the symbols array is NULL.
+	 * If either is NULL, there is nothing to update, so return immediately.
+	 */
 	if (manager == NULL || manager->array == NULL) {
 		return;
 	}
+
+	/*manager and symbols array are not NULL*/
+	/* Iterate over each symbol in the array */
 	for (i = 0; i < manager->used; ++i) {
-		manager->array[i].symbol_location += (100 + (manager->array[i].is_data ? steps : 0));
+		/* Update the location of the symbol by adding 100 plus the steps if it is a data symbol. */
+		manager->array[i].symbol_location += (FIRST_MEMORY_PLACE + (manager->array[i].is_data ? steps : 0));
 	}
+}
+
+int is_symbol_exists(const SymbolsManager* manager, const char* symbol_name) {
+	int i;
+	for (i = 0; i < manager->used; i++) {
+		if (strcmp(manager->array[i].symbol_name, symbol_name) == 0) {
+			return FOUND;
+		}
+	}
+	return NOT_FOUND; /* Indicate that the symbol was not found*/
 }
 
 /* Adding the function to add a reference symbol*/
@@ -310,8 +382,8 @@ int isRefExtSymbolExists(const SymbolsManager* manager, const char* symbol_name)
 	return NOT_FOUND; /* Return false if the symbol_name does not exist in the ext array*/
 }
 int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name) {
-	int i;	
-	
+	int i;
+
 	if (manager == NULL || symbol_name == NULL) {
 		return NOT_FOUND; /* Return 0 if the manager or symbol_name is NULL*/
 	}

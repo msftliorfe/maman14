@@ -1,13 +1,22 @@
 #include "assembler_manager.h"
 
+/**
+ * createAssemblerManager - 
+ * Creates and initializes a new AssemblerManager instance.
+ *
+ * @return AssemblerManager* A pointer to the newly created and initialized AssemblerManager instance.
+ */
 AssemblerManager* createAssemblerManager() {
 	AssemblerManager* manager = (AssemblerManager*)malloc(sizeof(AssemblerManager));
+	/*Failed to create AssemblerManager*/
 	if (manager == NULL) {
-		perror("Failed to create AssemblerManager");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Failed to create AssemblerManager");
+		return;
 	}
+	/*created AssemblerManager successfully*/
 	manager->IC = 0;
 	manager->DC = 0;
+	manager->has_assembler_errors = 1;
 	manager->dataItems = NULL;
 	manager->dataItemCount = 0;
 	manager->actionItems = NULL;
@@ -21,29 +30,52 @@ void destroyAssemblerManager(AssemblerManager* manager) {
 	free(manager);
 }
 
-
+/**
+ * first_scan -
+ * Performs the first scan of the file data and updates the symbol and assembler managers.
+ *
+ * This function iterates through each row of data in the FileManager's `post_macro` array and
+ * performs processing based on the type of pattern detected in each row. It updates the SymbolsManager
+ * with information about symbols, actions, data, and references and updates the AssemblerManager accordingly.
+ *
+ * @param fileManager A pointer to a FileManager instance containing the data to be scanned. The `post_macro` field
+ * is expected to be an array of strings, each representing a line of the file.
+ *
+ * @param assemblerManager A pointer to an AssemblerManager instance that keeps track of the current instruction counter (IC)
+ * and data counter (DC). This is used to update counters based on the type of data encountered.
+ *
+ * @param symbolsManager A pointer to a SymbolsManager instance used to manage and update symbol-related information
+ * based on the patterns detected in the file data.
+ */
 void first_scan(FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager) {
 	int i;
+	/* Iterate through each row of the file data */
 	for (i = 0; i < fileManager->row_count; ++i) {
 		char** line = fileManager->post_macro[i];
 
 		if (action_exists(line[0]) || isSymbolPattern(line[0]) || isDataPattern(line[0]) || isReferencePattern(line[0])) {
+			
+			/* If the pattern is a reference, update the symbol table with a reference */
 			if (isReferencePattern(line[0])) {
 				updateSymbolsTable(symbolsManager, line, -1);
 			}
+			/* If the pattern is a symbol and followed by data, update symbol table and process data */
 			else if (isSymbolPattern(line[0])) {
 				if (isDataPattern(line[1])) {
 					updateSymbolsTable(symbolsManager, line, assemblerManager->DC);
 					processDataLine(line + 1, assemblerManager);
 				}
+				/* If the pattern is a symbol and followed by an action, update symbol table and process action */
 				else if (action_exists(line[1])) {
 					updateSymbolsTable(symbolsManager, line, assemblerManager->IC);
 					processActionLine(line + 1, assemblerManager);
 				}
 			}
+			/* If the pattern is an action, process the action line */
 			else if (action_exists(line[0])) {
 				processActionLine(line, assemblerManager);
 			}
+			/* If the pattern is data, process the data line */
 			else if (isDataPattern(line[0])) {
 				processDataLine(line, assemblerManager);
 			}
@@ -212,47 +244,98 @@ void updateLocationDataSymbols(const SymbolsManager* symbolsManager, const Assem
 	updateDataSymbolsLocation(symbolsManager, manager->IC);
 }
 
+/**
+ * updateDataItemsLocation - 
+ * Updates the location of data items in the AssemblerManager.
+ *
+ * This function iterates through all data items managed by the AssemblerManager and updates their
+ * location by adding a base offset of 100 plus the current instruction counter (IC). This helps in
+ * adjusting the positions of data items relative to the current state of the assembler.
+ *
+ * @param manager A pointer to an AssemblerManager instance that contains the data items whose locations are to be updated.
+ * The function assumes that `manager` and `manager->dataItems` are not NULL and that `dataItemCount`
+ * correctly reflects the number of data items.
+ */
 void updateDataItemsLocation(const AssemblerManager* manager) {
 	int i;
+	/* Iterate over each data item in the manager's dataItems array */
 	for (i = 0; i < manager->dataItemCount; ++i) {
-		manager->dataItems[i].location += 100 + manager->IC;
+		/* Update the location of each data item by adding 100 plus the current instruction counter (IC) */
+		manager->dataItems[i].location += FIRST_MEMORY_PLACE + manager->IC;
 	}
 }
-
-void second_scan(FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager) {
+/**
+ * second_scan - 
+ * Processes and updates action items and entry symbols during the second scan.
+ *
+ * This function performs a second scan over the action items in the AssemblerManager and updates
+ * their metadata and values based on the symbols found in the SymbolsManager. It also processes
+ * entry symbols and updates the reference symbols accordingly.
+ *
+ * @param assemblerManager A pointer to an AssemblerManager instance containing action items that need to be processed.
+ * The function updates each action item's metadata and value based on its corresponding symbol.
+ *
+ * @param symbolsManager A pointer to a SymbolsManager instance containing symbol information used for updating action items
+ * and handling entry symbols. The function uses this to check symbol existence and retrieve locations.
+ */
+void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsManager) {
 	int i;
+	/* Process each action item in the assemblerManager */
 	for (i = 0; i < assemblerManager->actionItemCount; ++i) {
 		Item* actionItem = &assemblerManager->actionItems[i];
 
+		/* Check if the metadata indicates this action item is a label */
 		if (strcmp(actionItem->metadata, "LABEL") == 0) {
+			// Update metadata to be the value of the action item
 			actionItem->metadata = duplicate_string(actionItem->value);  /* Update metadata to be the value*/
+
+			/* Check if the value of the action item is an external symbol */
 			if (isRefExtSymbolExists(symbolsManager, actionItem->value)) {/* this is an ext label*/
+				// Convert the location to a 15-bit two's complement string
 				char* location_str = int_to_15bit_twos_complement(1);
+				
+				// Add a new reference symbol to the SymbolsManager
 				addReferenceSymbol(symbolsManager, actionItem->value, actionItem->location, FOUND); /* add new item to ref_symbols*/
 				/* Copy the new string into the value array*/
 				strncpy(actionItem->value, location_str, sizeof(actionItem->value) - 1);
 				actionItem->value[sizeof(actionItem->value) - 1] = '\0';  /* Ensure null-termination*/
+				
+				// Convert the bit string to an octal representation
 				actionItem->octal = bitStringToOctal(location_str);
 
+				// Free the dynamically allocated string
 				free(location_str);
 			}
 			else { /* this is ent symbol or just symbol - find its location in symbols table*/
 				int symbol_location = getSymbolLocation(symbolsManager, actionItem->value);
+				
+				// Generate a direct line string representation of the symbol location
 				char* location_str = generate_direct_line(symbol_location);
 				/* Copy the new string into the value array*/
 				strncpy(actionItem->value, location_str, sizeof(actionItem->value) - 1);
+				
+				// Convert the bit string to an octal representation
 				actionItem->octal = bitStringToOctal(location_str);
 
+				// Free the dynamically allocated string
 				free(location_str);
-
 			}
 		}
 	}
+
+	/* Process each entry symbol */
 	for (i = 0; i < symbolsManager->ent_used; ++i) {/* handle entry symbols*/
-		char* entlItem = symbolsManager->ent[i];
+		char* entlItem = symbolsManager->ent[i]; /*Get the current entry symbol*/
+		
+		/* Find the location of the entry symbol in the symbols table*/
 		int symbol_location = getSymbolLocation(symbolsManager, entlItem);
+		
+		/* Generate a direct line string representation of the symbol location*/
 		char* location_str = generate_direct_line(symbol_location);
+		
+		/* Add a reference symbol for the entry item to the SymbolsManager*/
 		addReferenceSymbol(symbolsManager, entlItem, symbol_location, NOT_FOUND); /* add new item to ref_symbols*/
+		/* Free the dynamically allocated string*/
 		free(location_str);
 	}
 }

@@ -25,8 +25,7 @@ int main(int argc, char** argv) {
 	FILE* ifp;
 	FileManager fileManager;
 	MacroManager macroManager;
-	int result;
-
+	
 	/*There isn't any file name*/
 	if (argc == 1)
 	{
@@ -44,30 +43,37 @@ int main(int argc, char** argv) {
 		init_macro_manager(&macroManager);
 
 		/*Check legality of file name*/
-
-
 		/*Process files provided by the user*/
-		result = input_process(&fileManager, &macroManager, *++argv);
-
-		if (result)
+		if (input_process(&fileManager, &macroManager, *++argv))
 		{
+			
 			/*Only if reading the file and creating the post-macro file worked, then continue*/
-			print_post_macro(&fileManager);/*ToDo should change to a file not print*/
-			printPostMacroToFile(*argv, &fileManager);
-			//print_post_macro_to_file(&fileManager);
+			/*print_post_macro(&fileManager);*//*Use only for work, asked only to file*/
+			
+			if (printPostMacroToFile(*argv, &fileManager)) {
+				/*print_post_macro_to_file(&fileManager); */
 
-			AssemblerManager* assemblerManager = createAssemblerManager();
+				/*Create assemblerManager*/
+				AssemblerManager* assemblerManager = createAssemblerManager();
+				if (assemblerManager!=NULL)
+				{
+					SymbolsManager* symbolsManager = createSymbolsManager();
+					if (symbolsManager != NULL)
+					{
+						first_scan(&fileManager, assemblerManager, symbolsManager);
+						updateLocationDataSymbols(symbolsManager, assemblerManager);
+						updateDataItemsLocation(assemblerManager);
 
-			SymbolsManager* symbolsManager = createSymbolsManager();
-			first_scan(&fileManager, assemblerManager, symbolsManager);
-			updateLocationDataSymbols(symbolsManager, assemblerManager);
-			updateDataItemsLocation(assemblerManager);
 
-
-			second_scan(&fileManager, assemblerManager, symbolsManager);
-
-			printObjToFile(*argv, assemblerManager);
-			printReferenceSymbolsToFile(*argv, symbolsManager);
+						second_scan(assemblerManager, symbolsManager);
+						if (assemblerManager->has_assembler_errors == 1 && symbolsManager->has_symbols_errors == 1)
+						{
+							printObjToFile(*argv, assemblerManager);
+							printReferenceSymbolsToFile(*argv, symbolsManager);
+						}
+					}
+				}
+			}
 		}
 		free_file_manager(&fileManager);
 	}

@@ -45,7 +45,7 @@ void free_file_manager(FileManager* manager) {
  *                      and retrieve their content.
  * @param file_path The path to the file to be processed. This is a string representing
  *                  the file's location in the filesystem.
- * @Return int 0 if the macro file was created successfully otherwise 1
+ * @return int 0 if the macro file was created successfully otherwise 1
  */
 int input_process(FileManager* fileManager, MacroManager* macroManager, char* file_path) {
 	int i, split_count, len;
@@ -142,7 +142,11 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 	return FOUND;
 }
 
-/*ToDo - not print - write to file!*/
+/**
+ *print_post_macro - 
+ *Prints the contents of the `post_macro` table from a FileManager structure.
+ *@param manager A pointer to a FileManager structure containing the data to be printed.
+ */
 void print_post_macro(FileManager* manager) {
 	int i, j, col, max_columns;
 	printf("post_macro\n");
@@ -192,7 +196,16 @@ void print_post_macro(FileManager* manager) {
 	}
 }
 
-void printPostMacroToFile(char* file_name, const FileManager* fileManager) {
+/**
+ * printPostMacroToFile - 
+ * Writes the content of the `post_macro` table from a FileManager structure 
+ * to a specified file. The data is formatted into a table, with columns 
+ * adjusted to fit the content.
+ * @param file_name The base name of the file where the data will be written
+ * @param fileManager A pointer to a FileManager structure containing the data to be printed
+ * @return int 0 if the content was written successfully in the macro file otherwise 1
+ */
+int printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 	int len;
 	int i, j, col, max_columns;
 	char* new_file_path;
@@ -201,6 +214,7 @@ void printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 	len = strlen(file_name) + strlen(POST_MACRO_FILE_EXTENSION) + 1;
 	new_file_path = malloc(len);
 
+	/*Failed to allocate memory*/
 	if (new_file_path == NULL) {
 		LOG_ERROR("Failed to allocate memory");
 		return NOT_FOUND;
@@ -208,18 +222,25 @@ void printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 
 	strcpy(new_file_path, file_name);
 	strcat(new_file_path, POST_MACRO_FILE_EXTENSION);
+	
+	/*Open file to write*/
 	FILE* file = fopen(new_file_path, "w");
+	
+	/*failed to open file*/
 	if (file == NULL) {
-		perror("Failed to open file ps.obj");
-		exit(EXIT_FAILURE);
+	strcpy(new_file_path, file_name);
+		FILE_ERROR("Failed to open file %s", new_file_path);
+		return NOT_FOUND;
 	}
 
+	/*file opened start writing*/
 	fprintf(file, "post_macro\n");
+	/*Nothing to write*/
 	if (fileManager->row_count == 0) {
 		fprintf(file, "No data to display.\n");
 		return;
 	}
-
+	/*There is data to write*/
 	/* Determine the maximum number of columns for proper formatting*/
 	/* depende on input file*/
 	max_columns = 0;
@@ -259,7 +280,7 @@ void printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 		}
 		fprintf(file, "\n");
 	}
-
+	return FOUND;
 }
 
 

@@ -13,5 +13,6 @@
 #define ENTRY_FILE_EXTENSION ".ent"
 #define WORD_SIZE_IN_BITS 15
 #define NUM_OF_ACTIONS 16
+#define FIRST_MEMORY_PLACE 100
 
 #endif /*CONSTANTS_H*/
