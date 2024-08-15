@@ -3,7 +3,8 @@
 
 #define OK 0
 #define LOG_ERROR(message) log_error(__func__, __LINE__, __FILE__, message)
-#define FILE_ERROR(message, file_path) log_error(__func__, __LINE__, __FILE__, message, file_path)
+#define FILE_ERROR(message, file_path) file_error(__func__, __LINE__, __FILE__, message, file_path)
+#define ACTION_ERROR(message, action_name) action_error(__func__, __LINE__, __FILE__, message, action_name)
 #define FOUND 1 /*Instead of bool true*/
 #define NOT_FOUND 0 /*Instead of bool false*/
 #define INPUT_FILE_EXTENSION ".as"

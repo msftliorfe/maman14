@@ -1,7 +1,7 @@
 #include "assembler_manager.h"
 
 /**
- * createAssemblerManager - 
+ * createAssemblerManager -
  * Creates and initializes a new AssemblerManager instance.
  *
  * @return AssemblerManager* A pointer to the newly created and initialized AssemblerManager instance.
@@ -52,33 +52,40 @@ void first_scan(FileManager* fileManager, AssemblerManager* assemblerManager, Sy
 	/* Iterate through each row of the file data */
 	for (i = 0; i < fileManager->row_count; ++i) {
 		char** line = fileManager->post_macro[i];
+		/*If the line starts with ; it's a comment move to next line*/
+		if (strcmp(line[0], ";") == 0) {
+			continue;
+		}
 
-		if (action_exists(line[0]) || isSymbolPattern(line[0]) || isDataPattern(line[0]) || isReferencePattern(line[0])) {
-			
-			/* If the pattern is a reference, update the symbol table with a reference */
-			if (isReferencePattern(line[0])) {
-				updateSymbolsTable(symbolsManager, line, -1);
+		/* If the pattern is a reference, update the symbol table with a reference */
+		if (isReferencePattern(line[0])) {
+			updateSymbolsTable(symbolsManager, line, -1);
+		}
+		/* If the pattern is a symbol and followed by data, update symbol table and process data */
+		else if (isSymbolPattern(line[0])) {
+			if (isDataPattern(line[1])) {
+				updateSymbolsTable(symbolsManager, line, assemblerManager->DC);
+				processDataLine(line + 1, assemblerManager);
 			}
-			/* If the pattern is a symbol and followed by data, update symbol table and process data */
-			else if (isSymbolPattern(line[0])) {
-				if (isDataPattern(line[1])) {
-					updateSymbolsTable(symbolsManager, line, assemblerManager->DC);
-					processDataLine(line + 1, assemblerManager);
-				}
-				/* If the pattern is a symbol and followed by an action, update symbol table and process action */
-				else if (action_exists(line[1])) {
-					updateSymbolsTable(symbolsManager, line, assemblerManager->IC);
-					processActionLine(line + 1, assemblerManager);
-				}
+			/* If the pattern is a symbol and followed by an action, update symbol table and process action */
+			else if (action_exists(line[1])) {
+				updateSymbolsTable(symbolsManager, line, assemblerManager->IC);
+				processActionLine(line + 1, assemblerManager);
 			}
-			/* If the pattern is an action, process the action line */
-			else if (action_exists(line[0])) {
-				processActionLine(line, assemblerManager);
+			else { /*action doesnt exists in allowed actions list*/
+				ACTION_ERROR("This action doesn't exists", line[1]);
 			}
-			/* If the pattern is data, process the data line */
-			else if (isDataPattern(line[0])) {
-				processDataLine(line, assemblerManager);
-			}
+		}
+		/* If the pattern is an action, process the action line */
+		else if (action_exists(line[0])) {
+			processActionLine(line, assemblerManager);
+		}
+		/* If the pattern is data, process the data line */
+		else if (isDataPattern(line[0])) {
+			processDataLine(line, assemblerManager);
+		}
+		else {
+			ACTION_ERROR("This action doesn't exists", line[1]);
 		}
 	}
 }
@@ -245,7 +252,7 @@ void updateLocationDataSymbols(const SymbolsManager* symbolsManager, const Assem
 }
 
 /**
- * updateDataItemsLocation - 
+ * updateDataItemsLocation -
  * Updates the location of data items in the AssemblerManager.
  *
  * This function iterates through all data items managed by the AssemblerManager and updates their
@@ -265,7 +272,7 @@ void updateDataItemsLocation(const AssemblerManager* manager) {
 	}
 }
 /**
- * second_scan - 
+ * second_scan -
  * Processes and updates action items and entry symbols during the second scan.
  *
  * This function performs a second scan over the action items in the AssemblerManager and updates
@@ -293,13 +300,13 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 			if (isRefExtSymbolExists(symbolsManager, actionItem->value)) {/* this is an ext label*/
 				// Convert the location to a 15-bit two's complement string
 				char* location_str = int_to_15bit_twos_complement(1);
-				
+
 				// Add a new reference symbol to the SymbolsManager
 				addReferenceSymbol(symbolsManager, actionItem->value, actionItem->location, FOUND); /* add new item to ref_symbols*/
 				/* Copy the new string into the value array*/
 				strncpy(actionItem->value, location_str, sizeof(actionItem->value) - 1);
 				actionItem->value[sizeof(actionItem->value) - 1] = '\0';  /* Ensure null-termination*/
-				
+
 				// Convert the bit string to an octal representation
 				actionItem->octal = bitStringToOctal(location_str);
 
@@ -308,12 +315,12 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 			}
 			else { /* this is ent symbol or just symbol - find its location in symbols table*/
 				int symbol_location = getSymbolLocation(symbolsManager, actionItem->value);
-				
+
 				// Generate a direct line string representation of the symbol location
 				char* location_str = generate_direct_line(symbol_location);
 				/* Copy the new string into the value array*/
 				strncpy(actionItem->value, location_str, sizeof(actionItem->value) - 1);
-				
+
 				// Convert the bit string to an octal representation
 				actionItem->octal = bitStringToOctal(location_str);
 
@@ -326,13 +333,13 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 	/* Process each entry symbol */
 	for (i = 0; i < symbolsManager->ent_used; ++i) {/* handle entry symbols*/
 		char* entlItem = symbolsManager->ent[i]; /*Get the current entry symbol*/
-		
+
 		/* Find the location of the entry symbol in the symbols table*/
 		int symbol_location = getSymbolLocation(symbolsManager, entlItem);
-		
+
 		/* Generate a direct line string representation of the symbol location*/
 		char* location_str = generate_direct_line(symbol_location);
-		
+
 		/* Add a reference symbol for the entry item to the SymbolsManager*/
 		addReferenceSymbol(symbolsManager, entlItem, symbol_location, NOT_FOUND); /* add new item to ref_symbols*/
 		/* Free the dynamically allocated string*/
