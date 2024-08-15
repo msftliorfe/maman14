@@ -207,4 +207,11 @@ int is_first_char_a_letter(const char* str) {
 	}
 }
 
+int is_first_char_quotation(const char* str) {
+	if (strcmp(str, "\"") == 0) {
+		return FOUND; /* Return true if the symbol_name exists in the ext array*/
+	}
+	return NOT_FOUND;
+}
+
 
