@@ -19,6 +19,7 @@
 #include "direct_builder.h"
 #include "constants.h"
 #include "error_manager.h"
+#include "macro_manager.h"
 
 typedef struct {
 	int location;
@@ -40,7 +41,7 @@ typedef struct {
 
 AssemblerManager* createAssemblerManager();
 void destroyAssemblerManager(AssemblerManager* manager);
-void first_scan(FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager);
+void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager);
 void processActionLine(char** line, AssemblerManager* assemblerManager);
 void processDataLine(char** line, AssemblerManager* assemblerManager);
 void addDataItem(AssemblerManager* manager, int location, const char* value);

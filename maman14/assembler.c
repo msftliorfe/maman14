@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
 					SymbolsManager* symbolsManager = createSymbolsManager();
 					if (symbolsManager != NULL)
 					{
-						first_scan(&fileManager, assemblerManager, symbolsManager);
+						first_scan(&macroManager ,&fileManager, assemblerManager, symbolsManager);
 						updateLocationDataSymbols(symbolsManager, assemblerManager);
 						updateDataItemsLocation(assemblerManager);
 

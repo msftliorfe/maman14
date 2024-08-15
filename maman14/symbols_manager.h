@@ -9,6 +9,7 @@
 #include "strings_manager.h"
 #include "constants.h"
 #include "error_manager.h"
+#include "macro_manager.h"
 
 typedef struct {
 	char* symbol_name;
@@ -58,7 +59,7 @@ void printReferenceSymbols(const SymbolsManager* manager);
 SymbolsManager* createSymbolsManager(void);
 
 /* Function to add a symbol to the manager*/
-void addSymbol(SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data);
+void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data);
 
 /* Function to print all symbols*/
 void printSymbols(const SymbolsManager* manager);
@@ -75,7 +76,7 @@ void destroySymbolsManager(SymbolsManager* manager);
 void addExtEnt(SymbolsManager* manager, const char* value, int is_ext);
 
 /* Function to update the symbols table*/
-void updateSymbolsTable(SymbolsManager* manager, char** line, int location);
+void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* manager, char** line, int location);
 
 /* Function to check if an action exists*/
 void printExt(const SymbolsManager* manager);

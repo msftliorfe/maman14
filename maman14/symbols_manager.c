@@ -77,9 +77,12 @@ SymbolsManager* createSymbolsManager() {
 }
 
 
-void addSymbol(SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data) {
+void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data) {
 	if (is_symbol_exists(manager, symbol_name)) {
 		LOG_ERROR("symbol already exists");
+	}
+	if (is_macro_name(macroManager, symbol_name)) {
+		LABEL_ERROR("symbol cannot be a macro name",symbol_name);
 	}
 	else {
 		if (manager->used == manager->size) {
@@ -217,7 +220,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 }
 
 
-void updateSymbolsTable(SymbolsManager* symbolsManager, char** line, int location) {
+void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManager, char** line, int location) {
 	if (strcmp(line[0], ".extern") == 0) {
 		addExtEnt(symbolsManager, line[1], FOUND);
 	}
@@ -233,10 +236,10 @@ void updateSymbolsTable(SymbolsManager* symbolsManager, char** line, int locatio
 			}
 
 			if (action_exists(line[1])) {
-				addSymbol(symbolsManager, symbol_name, location, NOT_FOUND);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND);
 			}
 			else if (strcmp(line[1], ".string") == 0 || strcmp(line[1], ".data") == 0) {
-				addSymbol(symbolsManager, symbol_name, location, FOUND);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND);
 			}
 
 			free(symbol_name);

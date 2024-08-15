@@ -47,33 +47,33 @@ void destroyAssemblerManager(AssemblerManager* manager) {
  * @param symbolsManager A pointer to a SymbolsManager instance used to manage and update symbol-related information
  * based on the patterns detected in the file data.
  */
-void first_scan(FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager) {
+void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager) {
 	int i;
 	/* Iterate through each row of the file data */
 	for (i = 0; i < fileManager->row_count; ++i) {
 		char** line = fileManager->post_macro[i];
 		/*If the line starts with ; it's a comment move to next line*/
-		if (strcmp(line[0], ";") == 0) {
+		if (strcmp(line[0], ";") == 0 || strcmp(line[0], "file") == 0) {
 			continue;
 		}
 
 		/* If the pattern is a reference, update the symbol table with a reference */
 		if (isReferencePattern(line[0])) {
-			updateSymbolsTable(symbolsManager, line, -1);
+			updateSymbolsTable(macroManager, symbolsManager, line, -1);
 		}
 		/* If the pattern is a symbol and followed by data, update symbol table and process data */
 		else if (isSymbolPattern(line[0])) {
 			if (isDataPattern(line[1])) {
-				updateSymbolsTable(symbolsManager, line, assemblerManager->DC);
+				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->DC);
 				processDataLine(line + 1, assemblerManager);
 			}
 			/* If the pattern is a symbol and followed by an action, update symbol table and process action */
 			else if (action_exists(line[1])) {
-				updateSymbolsTable(symbolsManager, line, assemblerManager->IC);
+				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->IC);
 				processActionLine(line + 1, assemblerManager);
 			}
 			else { /*action doesnt exists in allowed actions list*/
-				ACTION_ERROR("This action doesn't exists", line[1]);
+				LABEL_ERROR("This action doesn't exists", line[1]);
 			}
 		}
 		/* If the pattern is an action, process the action line */
@@ -85,7 +85,7 @@ void first_scan(FileManager* fileManager, AssemblerManager* assemblerManager, Sy
 			processDataLine(line, assemblerManager);
 		}
 		else {
-			ACTION_ERROR("This action doesn't exists", line[1]);
+			LABEL_ERROR("This action doesn't exists", line[1]);
 		}
 	}
 }
