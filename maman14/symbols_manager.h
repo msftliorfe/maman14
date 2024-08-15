@@ -10,7 +10,7 @@
 #include "constants.h"
 #include "error_manager.h"
 #include "macro_manager.h"
-
+#include "operands.h"
 typedef struct {
 	char* symbol_name;
 	int symbol_location;
@@ -92,6 +92,8 @@ int isReferencePattern(const char* word);
 void updateDataSymbolsLocation(const SymbolsManager* manager, int steps);
 
 int is_symbol_exists(const SymbolsManager* manager, const char* symbol_name);
+
+int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name);
 
 #endif /* SYMBOLS_MANAGER_H*/
 

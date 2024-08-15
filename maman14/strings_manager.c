@@ -9,11 +9,11 @@ int is_null_or_empty(const char* str) {
 }
 
 /**
- *split_string - 
+ *split_string -
  * Splits a string into an array of tokens based on spaces and commas.
  *
  *@param str The input string to be split into tokens.
- * 
+ *
  * @return A pointer to an array of strings, where each string is a token from the input
  *         string. The array is terminated with a NULL pointer.
  */
@@ -25,7 +25,7 @@ char** split_string(const char* str) {
 	/* Allocate an initial size for the result array*/
 	int initial_size = ARRAY_INITIAL_SIZE;
 	char** result = (char**)malloc(initial_size * sizeof(char*));
-	
+
 	if (result == NULL) {
 		LOG_ERROR("Memory allocation failed");
 		exit(EXIT_FAILURE);
@@ -135,7 +135,7 @@ char* strtrimlast(const char* src) {
 char* remove_first_last(const char* str) {
 	int len = strlen(str);
 	char* new_str;
- 
+
 	if (len <= 2) {
 		/* If the string has two or fewer characters, return an empty string*/
 		return duplicate_string("");
@@ -157,7 +157,7 @@ char* remove_first_last(const char* str) {
 
 char* clone_string(const char* input) {
 	char* clone;
-	
+
 	if (input == NULL) {
 		return NULL;
 	}
@@ -180,22 +180,31 @@ char* duplicate_string(const char* str) {
 	int len;
 	char* duplicate;
 
-    if (str == NULL) {
-        return NULL; /* Handle the case where the input is NULL*/
-    }
+	if (str == NULL) {
+		return NULL; /* Handle the case where the input is NULL*/
+	}
 
-    /* Allocate memory for the duplicate string*/
-    len = strlen(str) + 1; /* +1 for the null terminator*/
-    duplicate = (char*)malloc(len);
+	/* Allocate memory for the duplicate string*/
+	len = strlen(str) + 1; /* +1 for the null terminator*/
+	duplicate = (char*)malloc(len);
 
-    if (duplicate == NULL) {
-        return NULL; /* Handle memory allocation failure*/
-    }
+	if (duplicate == NULL) {
+		return NULL; /* Handle memory allocation failure*/
+	}
 
-    /* Copy the string into the allocated memory*/
-    strcpy(duplicate, str);
+	/* Copy the string into the allocated memory*/
+	strcpy(duplicate, str);
 
-    return duplicate;
+	return duplicate;
+}
+
+int is_first_char_a_letter(const char* str) {
+	if ((str[0] >= 'A' && str[0] <= 'Z') || (str[0] >= 'a' && str[0] <= 'z')) {
+		return FOUND;
+	}
+	else {
+		NOT_FOUND;
+	}
 }
 
 

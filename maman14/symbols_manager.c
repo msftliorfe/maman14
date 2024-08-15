@@ -81,8 +81,14 @@ void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* 
 	if (is_symbol_exists(manager, symbol_name)) {
 		LOG_ERROR("symbol already exists");
 	}
-	if (is_macro_name(macroManager, symbol_name)) {
-		LABEL_ERROR("symbol cannot be a macro name",symbol_name);
+	else if (is_macro_name(macroManager, symbol_name)) {
+		LABEL_ERROR("symbol cannot be a macro name", symbol_name);
+	}
+	else if (!is_valid_symbol_name(manager, symbol_name)) {
+		LABEL_ERROR("symbol isnt valid", symbol_name);
+	}
+	else if (!is_first_char_a_letter(symbol_name)) {
+		LABEL_ERROR("symbol isnt valid", symbol_name);
 	}
 	else {
 		if (manager->used == manager->size) {
@@ -398,6 +404,19 @@ int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name)
 	}
 
 	return NOT_FOUND; /* Return false if the symbol_name does not exist in the ext array*/
+}
+
+int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name) {
+	if (strlen(symbol_name) <= MAX_SYMBOL_NAME_LENGTH) {
+		return NOT_FOUND;
+	}
+
+	if (action_exists(symbol_name)) {
+		return NOT_FOUND;
+	}
+	if (is_valid_register(symbol_name)) {
+		return NOT_FOUND;
+	}
 }
 
 

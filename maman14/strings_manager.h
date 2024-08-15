@@ -24,4 +24,5 @@ char* remove_first_last(const char* str);
 
 char* clone_string(const char* input);
 char* duplicate_string(const char* str);
+int is_first_char_a_letter(const char* str);
 #endif /* STRINGS_H*/
