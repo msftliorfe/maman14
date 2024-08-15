@@ -28,7 +28,7 @@ char** split_string(const char* str) {
 
 	if (result == NULL) {
 		LOG_ERROR("Memory allocation failed");
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
 
 	start = str;
@@ -44,7 +44,7 @@ char** split_string(const char* str) {
 			result[index] = (char*)malloc((len + 1) * sizeof(char));
 			if (result[index] == NULL) {
 				LOG_ERROR("Memory allocation failed");
-				exit(EXIT_FAILURE);
+				return NULL;
 			}
 			strncpy(result[index], start, len);
 			result[index][len] = '\0';
@@ -57,7 +57,7 @@ char** split_string(const char* str) {
 				temp = (char**)realloc(result, initial_size * sizeof(char*));
 				if (temp == NULL) {
 					LOG_ERROR("Memory reallocation failed");
-					exit(EXIT_FAILURE);
+					return NULL;
 				}
 				result = temp;
 			}
@@ -88,8 +88,8 @@ char* letter_to_15bit_ascii(char letter) {
 	unsigned short ascii_value;
 
 	if (result == NULL) {
-		perror("Failed to allocate memory");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Failed to allocate memory");
+		return NULL;
 	}
 
 	/* Ensure the input is a lowercase English letter*/
@@ -144,8 +144,8 @@ char* remove_first_last(const char* str) {
 	/* Allocate memory for the new string*/
 	new_str = (char*)malloc(len - 1);
 	if (new_str == NULL) {
-		perror("Failed to allocate memory");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Failed to allocate memory");
+		return NULL;
 	}
 
 	/* Copy the substring excluding the first and last characters*/
@@ -208,7 +208,7 @@ int is_first_char_a_letter(const char* str) {
 }
 
 int is_first_char_quotation(const char* str) {
-	if (strcmp(str, "\"") == 0) {
+	if (str[0] == '"') {
 		return FOUND; /* Return true if the symbol_name exists in the ext array*/
 	}
 	return NOT_FOUND;

@@ -80,8 +80,8 @@ char* int_to_15bit_twos_complement(int number) {
 	unsigned short twos_complement;
 
 	if (result == NULL) {
-		perror("Failed to allocate memory");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Failed to allocate memory");
+		return NULL;
 	}
 
 	if (number < -16384 || number > 16383) {

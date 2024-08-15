@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
 
 
 						second_scan(assemblerManager, symbolsManager);
-						if (assemblerManager->has_assembler_errors == 1 && symbolsManager->has_symbols_errors == 1)
+						if (assemblerManager->has_assembler_errors == NOT_FOUND &&  symbolsManager->has_symbols_errors == NOT_FOUND)
 						{
 							printObjToFile(*argv, assemblerManager);
 							printReferenceSymbolsToFile(*argv, symbolsManager);

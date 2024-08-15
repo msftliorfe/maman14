@@ -16,7 +16,7 @@ AssemblerManager* createAssemblerManager() {
 	/*created AssemblerManager successfully*/
 	manager->IC = 0;
 	manager->DC = 0;
-	manager->has_assembler_errors = 1;
+	manager->has_assembler_errors = NOT_FOUND;
 	manager->dataItems = NULL;
 	manager->dataItemCount = 0;
 	manager->actionItems = NULL;
@@ -173,6 +173,10 @@ void processActionLine(char** line, AssemblerManager* assemblerManager) {
 
 void processDataLine(char** line, AssemblerManager* assemblerManager) {
 	char** data_lines = generateDataLine(line);
+	if (data_lines == NULL) {
+		assemblerManager->has_assembler_errors = FOUND;
+		return;
+	}
 	int count = 0;
 
 	while (data_lines[count] != NULL) {
@@ -185,8 +189,9 @@ void processDataLine(char** line, AssemblerManager* assemblerManager) {
 void addDataItem(AssemblerManager* manager, int location, const char* value) {
 	manager->dataItems = (Item*)realloc(manager->dataItems, (manager->dataItemCount + 1) * sizeof(Item));
 	if (manager->dataItems == NULL) {
-		perror("Failed to add data item");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Failed to add data item");
+		manager->has_assembler_errors = FOUND;
+		return;
 	}
 	manager->dataItems[manager->dataItemCount].location = location;
 	manager->dataItems[manager->dataItemCount].octal = bitStringToOctal(value);
@@ -198,8 +203,9 @@ void addDataItem(AssemblerManager* manager, int location, const char* value) {
 void addActionItem(AssemblerManager* manager, char* metadata, int location, const char* value) {
 	manager->actionItems = (Item*)realloc(manager->actionItems, (manager->actionItemCount + 1) * sizeof(Item));
 	if (manager->actionItems == NULL) {
-		perror("Failed to add action item");
-		exit(EXIT_FAILURE);
+		LABEL_ERROR("Failed to add action item", value);
+		manager->has_assembler_errors = FOUND;
+		return;
 	}
 	manager->actionItems[manager->actionItemCount].location = 100 + location;
 	manager->actionItems[manager->actionItemCount].octal = bitStringToOctal(value);
@@ -300,7 +306,9 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 			if (isRefExtSymbolExists(symbolsManager, actionItem->value)) {/* this is an ext label*/
 				// Convert the location to a 15-bit two's complement string
 				char* location_str = int_to_15bit_twos_complement(1);
-
+				if (location_str == NULL) {
+					assemblerManager->has_assembler_errors = FOUND;
+				}
 				// Add a new reference symbol to the SymbolsManager
 				addReferenceSymbol(symbolsManager, actionItem->value, actionItem->location, FOUND); /* add new item to ref_symbols*/
 				/* Copy the new string into the value array*/
@@ -365,8 +373,8 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	strcat(new_file_path, OBJECTS_FILE_EXTENSION);
 	FILE* file = fopen(new_file_path, "w");
 	if (file == NULL) {
-		perror("Failed to open file ps.obj");
-		exit(EXIT_FAILURE);
+		FILE_ERROR("Failed to open file", new_file_path);
+		return;
 	}
 
 	/* Print the first line: IC tab_space DC*/
@@ -411,7 +419,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				strcat(new_file_path, EXTERNALS_FILE_EXTENSION);
 				ext_file = fopen(new_file_path, "w");
 				if (ext_file == NULL) {
-					perror("Failed to open file ps.ext");
+					FILE_ERROR("Failed to open file", new_file_path);
 					exit(EXIT_FAILURE);
 				}
 				ext_has_values = 1;
@@ -433,8 +441,8 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				strcat(new_file_path, ENTRY_FILE_EXTENSION);
 				ent_file = fopen(new_file_path, "w");
 				if (ent_file == NULL) {
-					perror("Failed to open file ps.ent");
-					exit(EXIT_FAILURE);
+					FILE_ERROR("Failed to open file", new_file_path);
+					return;
 				}
 				ent_has_values = 1;
 			}

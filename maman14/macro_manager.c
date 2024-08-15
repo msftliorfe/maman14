@@ -7,7 +7,7 @@ void init_macro_manager(MacroManager* manager) {
 
 
 /**
- *process_file_line - 
+ *process_file_line -
  * Processes a line of input, checking for macro definitions and expansions.
  *
  * @param manager A pointer to the MacroManager structure used to manage macro definitions and expansions.
@@ -23,13 +23,13 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 	/* If the input line is empty, return NULL */
 	if (input_count == 0) return NULL;
 
-    /* If the input line ends a macro definition, update the macro context and return NULL */
+	/* If the input line ends a macro definition, update the macro context and return NULL */
 	if (strcmp(input[0], "endmacr") == 0) {
 		manager->is_macro_context = 0;
 		return NULL;
 	}
 
-    /* If in the middle of a macro definition, add the line to the current macro's command list */
+	/* If in the middle of a macro definition, add the line to the current macro's command list */
 	if (manager->is_macro_context) {
 		for (i = 0; i < manager->macro_count; ++i) {
 			if (strcmp(manager->macro_names[i], manager->current_macro_name) == 0) {
@@ -62,7 +62,7 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 		}
 	}
 
-    /* If the input line defines a new macro, initialize it in the MacroManager */
+	/* If the input line defines a new macro, initialize it in the MacroManager */
 	if (strcmp(input[0], "macr") == 0) {
 		manager->is_macro_context = 1;
 		strcpy(manager->current_macro_name, input[1]);
@@ -96,7 +96,7 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 				result[j] = malloc((row_length + 1) * sizeof(char*));
 				if (result[j] == NULL) {
 					/* Handle allocation failure*/
-					LOG_ERROR("Memory allocation failed");	
+					LOG_ERROR("Memory allocation failed");
 					return NULL;
 				}
 				for (k = 0; macro->commands[j][k] != NULL; ++k) {
@@ -120,13 +120,13 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 	processed_line = malloc((input_count + 1) * sizeof(char*));
 	if (processed_line == NULL) {
 		LOG_ERROR("Memory allocation failed");
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
 	for (i = 0; i < input_count; ++i) {
 		processed_line[i] = malloc((strlen(input[i]) + 1) * sizeof(char));
 		if (processed_line[i] == NULL) {
 			LOG_ERROR("Memory allocation failed");
-			exit(EXIT_FAILURE);
+			return NULL;
 		}
 		strcpy(processed_line[i], input[i]);
 	}
@@ -136,7 +136,7 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 }
 
 /**
- *is_macro_name - 
+ *is_macro_name -
  * Checks if the given name is a macro name managed by the MacroManager.
  *
  * @param manager A pointer to the MacroManager structure that contains macro names.
@@ -188,8 +188,8 @@ char*** get_macro_content(MacroManager* manager, const char* macro_name) {
 			return result;
 		}
 	}
- /* Return NULL if the macro_name was not found */
-    return NULL;
+	/* Return NULL if the macro_name was not found */
+	return NULL;
 }
 
 

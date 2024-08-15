@@ -13,8 +13,8 @@ char** handle_numbers(char** number_strings) {
 	/* Allocate memory for the result array, including space for the null terminator */
 	result = (char**)malloc((count + 1) * sizeof(char*));
 	if (result == NULL) {
-		fprintf(stderr, "Memory allocation failed\n");
-		exit(EXIT_FAILURE);
+		LOG_ERROR("Memory allocation failed\n");
+		return NULL;
 	}
 
 	for (i = 0; i < count; i++) {
@@ -36,6 +36,10 @@ char** handle_strings(const char* input_string) {
 	}
 	else {
 		char* trimmed = remove_first_last(input_string);
+		if (trimmed == NULL) {
+			LABEL_ERROR("string is not valid", input_string);
+			return "";
+		}
 		int length, i;
 		char** result;
 		const int extra_length = 1;  /* Additional slot for the 15 "0"s string*/
@@ -44,8 +48,8 @@ char** handle_strings(const char* input_string) {
 		length = strlen(trimmed);
 		result = (char**)malloc((length + extra_length) * sizeof(char*));
 		if (result == NULL) {
-			fprintf(stderr, "Memory allocation failed\n");
-			exit(EXIT_FAILURE);
+			LOG_ERROR("Memory allocation failed\n");
+			return NULL;
 		}
 
 		for (i = 0; i < length; i++) {
