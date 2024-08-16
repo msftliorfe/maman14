@@ -47,7 +47,7 @@ void destroyAssemblerManager(AssemblerManager* manager) {
  * @param symbolsManager A pointer to a SymbolsManager instance used to manage and update symbol-related information
  * based on the patterns detected in the file data.
  */
-void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager) {
+void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager, Action* actions) {
 	int i;
 	/* Iterate through each row of the file data */
 	for (i = 0; i < fileManager->row_count; ++i) {
@@ -59,26 +59,26 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 
 		/* If the pattern is a reference, update the symbol table with a reference */
 		if (isReferencePattern(line[0])) {
-			updateSymbolsTable(macroManager, symbolsManager, line, -1);
+			updateSymbolsTable(macroManager, symbolsManager, line, -1, actions);
 		}
 		/* If the pattern is a symbol and followed by data, update symbol table and process data */
 		else if (isSymbolPattern(line[0])) {
 			if (isDataPattern(line[1])) {
-				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->DC);
+				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->DC, actions);
 				processDataLine(line + 1, assemblerManager);
 			}
 			/* If the pattern is a symbol and followed by an action, update symbol table and process action */
-			else if (action_exists(line[1])) {
-				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->IC);
-				processActionLine(line + 1, assemblerManager);
+			else if (action_exists(actions, line[1])) {
+				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->IC, actions);
+				processActionLine(actions, line + 1, assemblerManager);
 			}
 			else { /*action doesnt exists in allowed actions list*/
 				LABEL_ERROR("This action doesn't exists", line[1]);
 			}
 		}
 		/* If the pattern is an action, process the action line */
-		else if (action_exists(line[0])) {
-			processActionLine(line, assemblerManager);
+		else if (action_exists(actions, line[0])) {
+			processActionLine(actions, line, assemblerManager);
 		}
 		/* If the pattern is data, process the data line */
 		else if (isDataPattern(line[0])) {
@@ -90,12 +90,13 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 	}
 }
 
-void processActionLine(char** line, AssemblerManager* assemblerManager) {
+void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager) {
 	int reg_dest_was_handled = NOT_FOUND;
-	char* first_line = process_first_line(line);
+	
+	char* first_line = process_first_line(actions, line);
 	char* action_name = clone_string(line[0]);
-	char* source_operands = get_source_operands(action_name);
-	char* destination_operands = get_destination_operands(action_name);
+	char* source_operands = get_source_operands(actions, action_name);
+	char* destination_operands = get_destination_operands(actions, action_name);
 	int has_source_operands = strcmp(source_operands, "-1") != 0;
 	int has_dest_operands = strcmp(destination_operands, "-1") != 0;
 	int source_reg_num, dest_reg_num, number, location_of_current_operand;
@@ -420,7 +421,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				ext_file = fopen(new_file_path, "w");
 				if (ext_file == NULL) {
 					FILE_ERROR("Failed to open file", new_file_path);
-					exit(EXIT_FAILURE);
+					return;
 				}
 				ext_has_values = 1;
 			}

@@ -76,7 +76,7 @@ SymbolsManager* createSymbolsManager() {
 }
 
 
-void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data) {
+void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data, Action* actions) {
 	if (is_symbol_exists(manager, symbol_name)) {
 		LOG_ERROR("symbol already exists");
 		manager->has_symbols_errors = FOUND;
@@ -86,7 +86,7 @@ void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* 
 		manager->has_symbols_errors = FOUND;
 
 	}
-	else if (!is_valid_symbol_name(manager, symbol_name)) {
+	else if (!is_valid_symbol_name(manager, symbol_name, actions)) {
 		LABEL_ERROR("symbol isnt valid", symbol_name);
 		manager->has_symbols_errors = FOUND;
 
@@ -189,7 +189,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 				free(manager->array);
 				free(manager->ent);
 				free(manager);
-				exit(EXIT_FAILURE);
+				return;
 			}
 			manager->ext_used++;
 		}
@@ -211,18 +211,18 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 					free(manager->array);
 					free(manager->ext);
 					free(manager);
-					exit(EXIT_FAILURE);
+					return;
 				}
 				manager->ent = new_ent;
 			}
 			manager->ent[manager->ent_used] = duplicate_string(value); /* Make a copy of the string*/
 			if (manager->ent[manager->ent_used] == NULL) {
-				perror("Failed to duplicate value");
+				LOG_ERROR("Failed to duplicate value");
 				free(manager->ent);
 				free(manager->array);
 				free(manager->ext);
 				free(manager);
-				exit(EXIT_FAILURE);
+				return;
 			}
 			manager->ent_used++;
 		}
@@ -231,7 +231,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 }
 
 
-void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManager, char** line, int location) {
+void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManager, char** line, int location, Action* actions) {
 	if (strcmp(line[0], ".extern") == 0) {
 		addExtEnt(symbolsManager, line[1], FOUND);
 	}
@@ -242,15 +242,16 @@ void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManag
 		if (isSymbolPattern(line[0])) {
 			char* symbol_name = strtrimlast(line[0]);
 			if (symbol_name == NULL) {
-				perror("Failed to duplicate symbol_name");
-				exit(EXIT_FAILURE);
+				LOG_ERROR("Failed to duplicate symbol_name");
+				symbolsManager->has_symbols_errors = FOUND;
+				return;
 			}
 
-			if (action_exists(line[1])) {
-				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND);
+			if (action_exists(actions, line[1])) {
+				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND, actions);
 			}
 			else if (strcmp(line[1], ".string") == 0 || strcmp(line[1], ".data") == 0) {
-				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND, actions);
 			}
 
 			free(symbol_name);
@@ -343,25 +344,27 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 		manager->ref_size *= 2;
 		new_ref_symbols = (ReferenceSymbol*)realloc(manager->ref_symbols, manager->ref_size * sizeof(ReferenceSymbol));
 		if (new_ref_symbols == NULL) {
-			perror("Failed to reallocate memory for ReferenceSymbol array");
+			LOG_ERROR("Failed to reallocate memory for ReferenceSymbol array");
 			free(manager->ref_symbols);
 			free(manager->ent);
 			free(manager->ext);
 			free(manager->array);
 			free(manager);
-			exit(EXIT_FAILURE);
+			manager->has_symbols_errors = FOUND;
+			return;
 		}
 		manager->ref_symbols = new_ref_symbols;
 	}
 	manager->ref_symbols[manager->ref_used].name = duplicate_string(name);
 	if (manager->ref_symbols[manager->ref_used].name == NULL) {
-		perror("Failed to duplicate name");
+		LOG_ERROR("Failed to duplicate name");
 		free(manager->ref_symbols);
 		free(manager->ent);
 		free(manager->ext);
 		free(manager->array);
 		free(manager);
-		exit(EXIT_FAILURE);
+		manager->has_symbols_errors = FOUND;
+		return;
 	}
 	manager->ref_symbols[manager->ref_used].location = location;
 	manager->ref_symbols[manager->ref_used].type = type;
@@ -411,12 +414,12 @@ int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name)
 	return NOT_FOUND; /* Return false if the symbol_name does not exist in the ext array*/
 }
 
-int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name) {
+int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name, Action* actions) {
 	if (strlen(symbol_name) > MAX_SYMBOL_NAME_LENGTH) {
 		return NOT_FOUND;
 	}
 
-	if (action_exists(symbol_name)) {
+	if (action_exists(actions, symbol_name)) {
 		return NOT_FOUND;
 	}
 	if (is_valid_register(symbol_name)) {

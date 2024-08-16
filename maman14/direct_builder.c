@@ -1,5 +1,20 @@
 #include "direct_builder.h"
 
+/**
+ * direct_are - 
+ * turns the ARE (Addressing Relocation Entry) bits for a label.
+ *
+ * The function returns a 3-bit binary string representing the ARE bits based on the given number.
+ * The ARE bits indicate how the address of the label should be handled:
+ * - "001" indicates the label is external (i.e., located outside the current file/module).
+ * - "010" indicates the label is not external (i.e., internal or relocatable within the current file/module).
+ *
+ * @param num The number representing the label's type or location.
+ *            - A value of 0 indicates the label is external.
+ *            - Any other value indicates the label is internal or relocatable.
+ *
+ * @return A string representing the 3-bit ARE binary code ("001" for external, "010" for internal/relocatable).
+ */
 char* direct_are(int num) {/* the num is a location of a label based on the LabelsManager*/
 	if (num == 0) { /* external labal*/
 		return "001";

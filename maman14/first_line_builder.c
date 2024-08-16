@@ -34,7 +34,7 @@ char* generate_operand_code(const char* operand) {
 	return code;
 }
 
-char* generate_first_line(const char* action_name, const char* operand_target, const char* operand_source) {
+char* generate_first_line(Action* actions, const char* action_name, const char* operand_target, const char* operand_source) {
 	char* operand_target_code;
 	char* operand_source_code;
 	char* action_code_string;
@@ -50,7 +50,7 @@ char* generate_first_line(const char* action_name, const char* operand_target, c
 	res[0] = '\0';
 
 	/* Generate action code (11-14)*/
-	action_code = get_action_code(action_name);
+	action_code = get_action_code(actions, action_name);
 	action_code_string = intTo4BitString(action_code);
 	strcat(res, action_code_string);
 	free(action_code_string); /* Free the allocated memory*/
@@ -77,19 +77,19 @@ char* generate_first_line(const char* action_name, const char* operand_target, c
 	return res;
 }
 
-char* process_first_line(const char** line) {
+char* process_first_line(Action* actions, const char** line) {
 	int arraySize = 0;
 	while (line[arraySize] != NULL) {
 		arraySize++;
 	}
 	if (arraySize == 1) {
-		return	generate_first_line(line[0], NULL, NULL);
+		return	generate_first_line(actions, line[0], NULL, NULL);
 	}
 	else if (arraySize == 2) {
-		return generate_first_line(line[0], line[1], NULL);
+		return generate_first_line(actions, line[0], line[1], NULL);
 	}
 	else {
-		return generate_first_line(line[0], line[2], line[1]);
+		return generate_first_line(actions, line[0], line[2], line[1]);
 	}
 }
 

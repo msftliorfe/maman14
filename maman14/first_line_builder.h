@@ -22,9 +22,9 @@
 char* generate_operand_code(const char* operand);
 
 /* Function to generate the first line of output based on the given parameters*/
-char* generate_first_line(const char* action_name, const char* operand_target, const char* operand_source);
+char* generate_first_line(Action* actions, const char* action_name, const char* operand_target, const char* operand_source);
 
-char* process_first_line(const char** line);
+char* process_first_line(Action* actions, const char** line);
 
 #endif /* FIRST_LINE_BUILDER_H*/
 

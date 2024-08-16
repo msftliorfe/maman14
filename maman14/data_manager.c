@@ -60,7 +60,7 @@ char** handle_strings(const char* input_string) {
 		zero_string = (char*)malloc((WORD_SIZE_IN_BITS + 1) * sizeof(char));  /* 15 "0"s + NULL terminator*/
 		if (zero_string == NULL) {
 			LOG_ERROR("Memory allocation failed");
-			exit(EXIT_FAILURE);
+			return NULL;
 		}
 		memset(zero_string, '0', WORD_SIZE_IN_BITS);  /* Fill with "0"s*/
 		zero_string[WORD_SIZE_IN_BITS] = '\0';        /* Null-terminate the string*/

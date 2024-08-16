@@ -25,13 +25,20 @@ int main(int argc, char** argv) {
 	FILE* ifp;
 	FileManager fileManager;
 	MacroManager macroManager;
-	
+
+
+
 	/*There isn't any file name*/
 	if (argc == 1)
 	{
 		LOG_ERROR("There isn't any file name as input");
 		return !OK;
 	}
+
+	Action actions[16];
+
+	intialize_actions_array(actions);
+
 
 	/*There is at least 1 file name. Start reading*/
 	while (--argc > 0)
@@ -46,27 +53,27 @@ int main(int argc, char** argv) {
 		/*Process files provided by the user*/
 		if (input_process(&fileManager, &macroManager, *++argv))
 		{
-			
+
 			/*Only if reading the file and creating the post-macro file worked, then continue*/
 			/*print_post_macro(&fileManager);*//*Use only for work, asked only to file*/
-			
+
 			if (printPostMacroToFile(*argv, &fileManager)) {
 				/*print_post_macro_to_file(&fileManager); */
 
 				/*Create assemblerManager*/
 				AssemblerManager* assemblerManager = createAssemblerManager();
-				if (assemblerManager!=NULL)
+				if (assemblerManager != NULL)
 				{
 					SymbolsManager* symbolsManager = createSymbolsManager();
 					if (symbolsManager != NULL)
 					{
-						first_scan(&macroManager ,&fileManager, assemblerManager, symbolsManager);
+						first_scan(&macroManager, &fileManager, assemblerManager, symbolsManager, actions);
 						updateLocationDataSymbols(symbolsManager, assemblerManager);
 						updateDataItemsLocation(assemblerManager);
 
 
 						second_scan(assemblerManager, symbolsManager);
-						if (assemblerManager->has_assembler_errors == NOT_FOUND &&  symbolsManager->has_symbols_errors == NOT_FOUND)
+						if (assemblerManager->has_assembler_errors == NOT_FOUND && symbolsManager->has_symbols_errors == NOT_FOUND)
 						{
 							printObjToFile(*argv, assemblerManager);
 							printReferenceSymbolsToFile(*argv, symbolsManager);

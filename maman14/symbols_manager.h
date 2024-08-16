@@ -59,7 +59,7 @@ void printReferenceSymbols(const SymbolsManager* manager);
 SymbolsManager* createSymbolsManager(void);
 
 /* Function to add a symbol to the manager*/
-void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data);
+void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data, Action* actions);
 
 /* Function to print all symbols*/
 void printSymbols(const SymbolsManager* manager);
@@ -76,7 +76,7 @@ void destroySymbolsManager(SymbolsManager* manager);
 void addExtEnt(SymbolsManager* manager, const char* value, int is_ext);
 
 /* Function to update the symbols table*/
-void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* manager, char** line, int location);
+void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* manager, char** line, int location, Action* actions);
 
 /* Function to check if an action exists*/
 void printExt(const SymbolsManager* manager);
@@ -93,7 +93,7 @@ void updateDataSymbolsLocation(const SymbolsManager* manager, int steps);
 
 int is_symbol_exists(const SymbolsManager* manager, const char* symbol_name);
 
-int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name);
+int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name, Action* actions);
 
 #endif /* SYMBOLS_MANAGER_H*/
 
