@@ -98,7 +98,7 @@ char** handle_strings(const char* input_string) {
  *         the result of `handle_numbers`. If it is a string, it returns the result of `handle_strings`.
  *         Returns NULL if memory allocation fails or if an error occurs.
  */
-char** generateDataLine(const char** input_array) {
+char** generateDataLine(char** input_array) {
 	if (strcmp(input_array[0], ".data") == 0) {
 		return handle_numbers(input_array + 1);
 	}
