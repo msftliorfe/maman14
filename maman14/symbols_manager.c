@@ -450,12 +450,12 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 		new_ref_symbols = (ReferenceSymbol*)realloc(manager->ref_symbols, manager->ref_size * sizeof(ReferenceSymbol));
 		if (new_ref_symbols == NULL) {
 			LOG_ERROR("Failed to reallocate memory for ReferenceSymbol array");
+			manager->has_symbols_errors = FOUND;
 			free(manager->ref_symbols);
 			free(manager->ent);
 			free(manager->ext);
 			free(manager->array);
 			free(manager);
-			manager->has_symbols_errors = FOUND;
 			return;
 		}
 		manager->ref_symbols = new_ref_symbols;
@@ -463,12 +463,12 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 	manager->ref_symbols[manager->ref_used].name = duplicate_string(name);
 	if (manager->ref_symbols[manager->ref_used].name == NULL) {
 		LOG_ERROR("Failed to duplicate name");
+		manager->has_symbols_errors = FOUND;
 		free(manager->ref_symbols);
 		free(manager->ent);
 		free(manager->ext);
 		free(manager->array);
 		free(manager);
-		manager->has_symbols_errors = FOUND;
 		return;
 	}
 	manager->ref_symbols[manager->ref_used].location = location;
@@ -554,7 +554,7 @@ int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name)
  * @param actions The Action instance used to check for existing actions.
  * @return `FOUND` if the symbol name is valid, `NOT_FOUND` otherwise.
  */
-int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name, Action* actions) {
+int is_valid_symbol_name(const SymbolsManager* manager, char* symbol_name, Action* actions) {
 	if (strlen(symbol_name) > MAX_SYMBOL_NAME_LENGTH) {
 		return NOT_FOUND;
 	}

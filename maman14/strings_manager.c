@@ -72,7 +72,7 @@ char** split_string(const char* str) {
 }
 
 /**
- * free_split_string - 
+ * free_split_string -
  * Frees the memory allocated for an array of strings.
  *
  * @param split_str A pointer to an array of strings, where each string is dynamically allocated.
@@ -88,7 +88,7 @@ void free_split_string(char** split_str) {
 }
 
 /**
- * letter_to_15bit_ascii - 
+ * letter_to_15bit_ascii -
  * Converts a lowercase English letter to a 15-bit ASCII binary string.
  *
  * @param letter The lowercase English letter to convert (from 'a' to 'z').
@@ -122,7 +122,7 @@ char* letter_to_15bit_ascii(char letter) {
 }
 
 /**
- * strtrimlast - 
+ * strtrimlast -
  * Creates a new string that is a copy of the input string with the last character removed.
  *
  * @param src The input string from which the last character will be removed.
@@ -209,7 +209,7 @@ char* clone_string(const char* input) {
 }
 
 /**
- * duplicate_string - 
+ * duplicate_string -
  * Duplicates a string by allocating memory and copying its contents.
  *
  * @param str The string to duplicate.
@@ -238,7 +238,7 @@ char* duplicate_string(const char* str) {
 }
 
 /**
- * is_first_char_a_letter - 
+ * is_first_char_a_letter -
  * Checks if the first character of a string is a letter.
  *
  * @param str The input string to check.
@@ -249,12 +249,12 @@ int is_first_char_a_letter(const char* str) {
 		return FOUND;
 	}
 	else {
-		NOT_FOUND;
+		return	NOT_FOUND;
 	}
 }
 
 /**
- * is_first_char_quotation - 
+ * is_first_char_quotation -
  * Checks if the first character of a string is a double quotation mark.
  *
  * @param str The input string to check.
