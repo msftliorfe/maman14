@@ -69,7 +69,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 	FILE* file = fopen(new_file_path, "r");
 	if (!file) {
 		/*Failed to open file*/
-		FILE_ERROR("Failed to open file", new_file_path);
+		file_error("input_process", 72, "file_manager.c", "Failed to open file", new_file_path);
 		return NOT_FOUND;
 	}
 
@@ -143,7 +143,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 }
 
 /**
- *print_post_macro - 
+ *print_post_macro -
  *Prints the contents of the `post_macro` table from a FileManager structure.
  *@param manager A pointer to a FileManager structure containing the data to be printed.
  */
@@ -197,9 +197,9 @@ void print_post_macro(FileManager* manager) {
 }
 
 /**
- * printPostMacroToFile - 
- * Writes the content of the `post_macro` table from a FileManager structure 
- * to a specified file. The data is formatted into a table, with columns 
+ * printPostMacroToFile -
+ * Writes the content of the `post_macro` table from a FileManager structure
+ * to a specified file. The data is formatted into a table, with columns
  * adjusted to fit the content.
  * @param file_name The base name of the file where the data will be written
  * @param fileManager A pointer to a FileManager structure containing the data to be printed
@@ -222,14 +222,14 @@ int printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 
 	strcpy(new_file_path, file_name);
 	strcat(new_file_path, POST_MACRO_FILE_EXTENSION);
-	
+
 	/*Open file to write*/
 	FILE* file = fopen(new_file_path, "w");
-	
+
 	/*failed to open file*/
 	if (file == NULL) {
-	strcpy(new_file_path, file_name);
-		FILE_ERROR("Failed to open file %s", new_file_path);
+		strcpy(new_file_path, file_name);
+		file_error("printPostMacroToFile", 501, "file_manager.c", "Failed to open file", new_file_path);
 		return NOT_FOUND;
 	}
 

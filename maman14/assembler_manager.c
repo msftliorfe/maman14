@@ -445,7 +445,7 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	strcat(new_file_path, OBJECTS_FILE_EXTENSION);
 	FILE* file = fopen(new_file_path, "w");
 	if (file == NULL) {
-		FILE_ERROR("Failed to open file", new_file_path);
+		file_error("printObjToFile", 448, "assembler_manager.c", "Failed to open file", new_file_path);
 		return;
 	}
 
@@ -498,7 +498,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				strcat(new_file_path, EXTERNALS_FILE_EXTENSION);
 				ext_file = fopen(new_file_path, "w");
 				if (ext_file == NULL) {
-					FILE_ERROR("Failed to open file", new_file_path);
+					file_error("printReferenceSymbolsToFile", 501, "assembler_manager.c", "Failed to open file", new_file_path);
 					return;
 				}
 				ext_has_values = 1;
@@ -520,7 +520,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				strcat(new_file_path, ENTRY_FILE_EXTENSION);
 				ent_file = fopen(new_file_path, "w");
 				if (ent_file == NULL) {
-					FILE_ERROR("Failed to open file", new_file_path);
+					file_error("printReferenceSymbolsToFile", 523, "assembler_manager.c", "Failed to open file", new_file_path);
 					return;
 				}
 				ent_has_values = 1;
