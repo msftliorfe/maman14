@@ -22,6 +22,14 @@ char* direct_are(int num) {/* the num is a location of a label based on the Labe
 	return "010";
 }
 
+/**
+ * generate_direct_line -
+ * Generates a direct line string representing a label's location in binary format.
+ *
+ * @param num The location of the label, which is used to generate the binary representation.
+ * @return A string that combines the 12-bit binary representation and the static direct addressing string.
+ *         Returns NULL if memory allocation fails or if any intermediate step fails.
+ */
 char* generate_direct_line(int num) { /* the num is a location of a label based on the LabelsManager*/
 	int combinedLength;
 	char* combinedString;

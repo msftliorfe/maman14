@@ -24,6 +24,12 @@ AssemblerManager* createAssemblerManager() {
 	return manager;
 }
 
+/**
+ * destroyAssemblerManager -
+ * Frees the memory allocated for an AssemblerManager structure.
+ *
+ * @param manager A pointer to the AssemblerManager structure to be destroyed.
+ */
 void destroyAssemblerManager(AssemblerManager* manager) {
 	free(manager->dataItems);
 	free(manager->actionItems);
@@ -85,11 +91,24 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 			processDataLine(line, assemblerManager);
 		}
 		else {
+			/*Action doesn't exists*/
 			LABEL_ERROR("This action doesn't exists", line[1]);
 		}
 	}
 }
 
+/**
+ * processActionLine -
+ * Processes a single line of assembly code that contains an action.
+ *
+ * This function analyzes an assembly line, determines the types of operands,
+ * and generates the corresponding machine code. It then adds the generated code
+ * to the assembler's instruction set.
+ *
+ * @param actions A pointer to the array of Action structures.
+ * @param line A double pointer to the line of assembly code being processed.
+ * @param assemblerManager A pointer to the AssemblerManager that manages the assembly process.
+ */
 void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager) {
 	int reg_dest_was_handled = NOT_FOUND;
 	
@@ -187,6 +206,13 @@ void processDataLine(char** line, AssemblerManager* assemblerManager) {
 	}
 }
 
+/**
+ * addDataItem -
+ * Processes a line of assembly code that contains data definitions.
+ *
+ * @param line A double pointer to the line of assembly code being processed.
+ * @param assemblerManager A pointer to the AssemblerManager that manages the assembly process.
+ */
 void addDataItem(AssemblerManager* manager, int location, const char* value) {
 	manager->dataItems = (Item*)realloc(manager->dataItems, (manager->dataItemCount + 1) * sizeof(Item));
 	if (manager->dataItems == NULL) {
@@ -201,6 +227,15 @@ void addDataItem(AssemblerManager* manager, int location, const char* value) {
 	manager->dataItemCount++;
 }
 
+/**
+ * addActionItem -
+ * Adds a new action item to the AssemblerManager's action items list.
+ *
+ * @param manager A pointer to the AssemblerManager that manages action items.
+ * @param metadata A string containing metadata associated with the action item (e.g., label or comment).
+ * @param location The location (address) of the action item in the instruction counter (IC).
+ * @param value A string representing the machine code or value of the action item.
+ */
 void addActionItem(AssemblerManager* manager, char* metadata, int location, const char* value) {
 	manager->actionItems = (Item*)realloc(manager->actionItems, (manager->actionItemCount + 1) * sizeof(Item));
 	if (manager->actionItems == NULL) {
@@ -215,9 +250,17 @@ void addActionItem(AssemblerManager* manager, char* metadata, int location, cons
 	manager->actionItems[manager->actionItemCount].metadata = metadata;
 	manager->actionItemCount++;
 	manager->IC++;
-
 }
 
+/**
+ * printItems -
+ * Prints the details of a list of items in a tabular format.
+ * Used only while working, unnecessary for final work
+ *
+ * @param items A pointer to the array of `Item` structures to be printed.
+ * @param itemCount The number of items in the array.
+ * @param includeMetadata Flag indicating whether to include metadata in the output (1 to include, 0 to exclude).
+ */
 void printItems(const Item* items, int itemCount, int includeMetadata) {
 	int i;
 	if (includeMetadata) {
@@ -239,7 +282,13 @@ void printItems(const Item* items, int itemCount, int includeMetadata) {
 }
 
 
-
+/**
+ * printDataItems -
+ * Prints the data items managed by the AssemblerManager.
+ * Used only while working, unnecessary for final work
+ *
+ * @param manager A pointer to the AssemblerManager that contains the data items.
+ */
 void printDataItems(const AssemblerManager* manager) {
 	printf("\n\n");
 
@@ -247,6 +296,13 @@ void printDataItems(const AssemblerManager* manager) {
 	printItems(manager->dataItems, manager->dataItemCount, NOT_FOUND);
 }
 
+/**
+ * printActionItems -
+ * Prints the action items managed by the AssemblerManager.
+ * Used only while working, unnecessary for final work
+ *
+ * @param manager A pointer to the AssemblerManager that contains the action items.
+ */
 void printActionItems(const AssemblerManager* manager) {
 	printf("\n\n");
 
@@ -254,6 +310,13 @@ void printActionItems(const AssemblerManager* manager) {
 	printItems(manager->actionItems, manager->actionItemCount, FOUND);
 }
 
+/**
+ * updateLocationDataSymbols - 
+ * Updates the location information of data symbols in the SymbolsManager.
+ *
+ * @param symbolsManager A pointer to the SymbolsManager that manages symbol data.
+ * @param manager A pointer to the AssemblerManager that contains the current instruction counter (IC).
+ */
 void updateLocationDataSymbols(const SymbolsManager* symbolsManager, const AssemblerManager* manager) {
 	updateDataSymbolsLocation(symbolsManager, manager->IC);
 }
@@ -356,6 +419,13 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 	}
 }
 
+/**
+ * printObjToFile -
+ * Writes the object code to a file specified by the given file name.
+ *
+ * @param file_name The base name of the file to which the object code will be written.
+ * @param assemblerManager A pointer to the AssemblerManager that contains the action and data items.
+ */
 void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	int i;
 	int len;
@@ -394,6 +464,13 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	fclose(file);
 }
 
+/**
+ * printReferenceSymbolsToFile -
+ * Writes reference symbols to external and entry files based on their type.
+ *
+ * @param file_name The base name of the file to which the symbols will be written.
+ * @param manager A pointer to the SymbolsManager that contains the reference symbols.
+ */
 void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager) {
 	int len;
 	char* new_file_path;
@@ -458,4 +535,3 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 		fclose(ent_file);
 	}
 }
-

@@ -71,7 +71,12 @@ char** split_string(const char* str) {
 	return result;
 }
 
-/* Function to free the allocated memory for the array of strings*/
+/**
+ * free_split_string - 
+ * Frees the memory allocated for an array of strings.
+ *
+ * @param split_str A pointer to an array of strings, where each string is dynamically allocated.
+ */
 void free_split_string(char** split_str) {
 	if (split_str != NULL) {
 		int i;
@@ -82,6 +87,13 @@ void free_split_string(char** split_str) {
 	}
 }
 
+/**
+ * letter_to_15bit_ascii - 
+ * Converts a lowercase English letter to a 15-bit ASCII binary string.
+ *
+ * @param letter The lowercase English letter to convert (from 'a' to 'z').
+ * @return A string representing the letter in 15-bit binary format, or NULL if memory allocation fails or input is invalid.
+ */
 char* letter_to_15bit_ascii(char letter) {
 	char* result = (char*)malloc(16 * sizeof(char));
 	int i;
@@ -109,6 +121,13 @@ char* letter_to_15bit_ascii(char letter) {
 	return result;
 }
 
+/**
+ * strtrimlast - 
+ * Creates a new string that is a copy of the input string with the last character removed.
+ *
+ * @param src The input string from which the last character will be removed.
+ * @return A new string without the last character, or NULL if the input string is empty or memory allocation fails.
+ */
 char* strtrimlast(const char* src) {
 	int len = strlen(src);
 	char* dest;
@@ -132,6 +151,13 @@ char* strtrimlast(const char* src) {
 	return dest;
 }
 
+/**
+ * remove_first_last -
+ * Creates a duplicate of a string.
+ *
+ * @param str The string to duplicate.
+ * @return A newly allocated duplicate of the input string, or NULL if memory allocation fails.
+ */
 char* remove_first_last(const char* str) {
 	int len = strlen(str);
 	char* new_str;
@@ -155,6 +181,13 @@ char* remove_first_last(const char* str) {
 	return new_str;
 }
 
+/**
+ * clone_string -
+ * Clones a string by allocating memory and copying its contents.
+ *
+ * @param input The string to clone.
+ * @return A new string that is a duplicate of the input string, or NULL if the input is NULL or memory allocation fails.
+ */
 char* clone_string(const char* input) {
 	char* clone;
 
@@ -175,7 +208,13 @@ char* clone_string(const char* input) {
 	return clone;
 }
 
-
+/**
+ * duplicate_string - 
+ * Duplicates a string by allocating memory and copying its contents.
+ *
+ * @param str The string to duplicate.
+ * @return A new string that is a duplicate of the input string, or NULL if the input is NULL or memory allocation fails.
+ */
 char* duplicate_string(const char* str) {
 	int len;
 	char* duplicate;
@@ -198,6 +237,13 @@ char* duplicate_string(const char* str) {
 	return duplicate;
 }
 
+/**
+ * is_first_char_a_letter - 
+ * Checks if the first character of a string is a letter.
+ *
+ * @param str The input string to check.
+ * @return FOUND (1) if the first character is a letter, NOT_FOUND (0) otherwise.
+ */
 int is_first_char_a_letter(const char* str) {
 	if ((str[0] >= 'A' && str[0] <= 'Z') || (str[0] >= 'a' && str[0] <= 'z')) {
 		return FOUND;
@@ -207,6 +253,13 @@ int is_first_char_a_letter(const char* str) {
 	}
 }
 
+/**
+ * is_first_char_quotation - 
+ * Checks if the first character of a string is a double quotation mark.
+ *
+ * @param str The input string to check.
+ * @return FOUND (1) if the first character is a double quotation mark, NOT_FOUND (0) otherwise.
+ */
 int is_first_char_quotation(const char* str) {
 	if (str[0] == '"') {
 		return FOUND; /* Return true if the symbol_name exists in the ext array*/

@@ -1,5 +1,12 @@
 #include "data_manager.h"
 
+/**
+ * handle_numbers - 
+ * Converts an array of number strings into an array of 15-bit two's complement representations.
+ *
+ * @param number_strings An array of strings where each string represents a number.
+ * @return A new array of strings representing the 15-bit two's complement of each number. Returns NULL if memory allocation fails.
+ */
 char** handle_numbers(char** number_strings) {
 	char** result;
 	int count = 0;
@@ -28,7 +35,14 @@ char** handle_numbers(char** number_strings) {
 	return result;
 }
 
-
+/**
+ * handle_strings -
+ * Converts an input string into an array of 15-bit ASCII representations of its characters.
+ *
+ * @param input_string The input string, which must be enclosed in quotation marks.
+ * @return A new array of strings representing the 15-bit ASCII of each character in the input string,
+ *         followed by a string of 15 "0"s. Returns NULL if memory allocation fails or if the input is invalid.
+ */
 char** handle_strings(const char* input_string) {
 	if (!is_first_char_quotation(input_string)) {
 		LABEL_ERROR("string is not valid", input_string);
@@ -68,13 +82,22 @@ char** handle_strings(const char* input_string) {
 
 		result[length + 1] = NULL;  /* NULL-terminate the array*/
 
-		free(trimmed);  /* Don't forget to free the trimmed string if it was dynamically allocated*/
+		free(trimmed);  /* Free the trimmed string if it was dynamically allocated*/
 		return result;
 	}
 }
 
 
-
+/**
+ * generateDataLine -
+ * Generates an array of strings based on the type of data specified in the input array.
+ *
+ * @param input_array An array of strings where the first element is a directive (e.g., ".data") and
+ *                    subsequent elements contain the data to process.
+ * @return A new array of strings representing processed data. If the directive is `.data`, it returns
+ *         the result of `handle_numbers`. If it is a string, it returns the result of `handle_strings`.
+ *         Returns NULL if memory allocation fails or if an error occurs.
+ */
 char** generateDataLine(const char** input_array) {
 	if (strcmp(input_array[0], ".data") == 0) {
 		return handle_numbers(input_array + 1);

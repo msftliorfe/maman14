@@ -1,6 +1,7 @@
 #include "register_builder.h"
 
 /**
+ * register_are -  
  * Function to return the ARE string.
  * @return The ARE string.
  */
@@ -8,6 +9,14 @@ char* register_are() {
 	return "100";
 }
 
+/**
+ * generate_single_register_line -
+ * Generates a binary string for a register line.
+ *
+ * @param register_number The number of the register (0-7).
+ * @param is_source Boolean flag indicating if the register is a source (1) or destination (0).
+ * @return A string representing the register line in binary format, or NULL if memory allocation fails.
+ */
 char* generate_single_register_line(int register_number, int is_source) {
 	char* register_number_string = intToThreeBitBinary(register_number);
 	char* staticString = register_are();
@@ -43,6 +52,13 @@ char* generate_single_register_line(int register_number, int is_source) {
 	return res;
 }
 
+/**
+ * generate_combined_register_line -
+ * Converts an integer to a 3-bit binary string.
+ *
+ * @param num The integer number to convert (0-7).
+ * @return A string representing the number in 3-bit binary format, or NULL if memory allocation fails.
+ */
 char* generate_combined_register_line(int a_register_number, int b_register_number) {
 	char* a_register_number_string = intToThreeBitBinary(a_register_number);
 	char* b_register_number_string = intToThreeBitBinary(b_register_number);

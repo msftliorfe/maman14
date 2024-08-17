@@ -10,8 +10,6 @@
 #include "constants.h"
 #include "error_manager.h"
 
-#include <stddef.h>/*ToDo -  change this!*/
-
 /* Function to generate the ARE bits for a direct addressing line*/
 char* direct_are(int num);
 

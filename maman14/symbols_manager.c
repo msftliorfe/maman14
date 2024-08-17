@@ -75,7 +75,17 @@ SymbolsManager* createSymbolsManager() {
 	return manager;
 }
 
-
+/**
+ * addSymbol - 
+ * Adds a new symbol to the SymbolsManager if all validation checks pass.
+ *
+ * @param macroManager The MacroManager instance used to check if the symbol is a macro name.
+ * @param manager The SymbolsManager instance where the symbol will be added.
+ * @param symbol_name The name of the symbol to add.
+ * @param symbol_location The location of the symbol.
+ * @param is_data Flag indicating if the symbol is data.
+ * @param actions Action instance used for additional symbol name validation.
+ */
 void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data, Action* actions) {
 	if (is_symbol_exists(manager, symbol_name)) {
 		LOG_ERROR("symbol already exists");
@@ -122,6 +132,13 @@ void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* 
 
 }
 
+/**
+ * printSymbols -
+ * Prints the symbols managed by the SymbolsManager in a formatted table.
+ * Used only during work. Unnecessary for final work.
+ *
+ * @param manager The SymbolsManager instance containing the symbols to be printed.
+ */
 void printSymbols(const SymbolsManager* manager) {
 	int i;
 	printf("\n\n");
@@ -134,6 +151,14 @@ void printSymbols(const SymbolsManager* manager) {
 	}
 }
 
+/**
+ * getSymbolLocation - 
+ * Retrieves the location of a symbol by its name.
+ *
+ * @param manager The SymbolsManager instance containing the symbols.
+ * @param symbol_name The name of the symbol to find.
+ * @return The location of the symbol if found, or -1 if the symbol is not found.
+ */
 int getSymbolLocation(const SymbolsManager* manager, const char* symbol_name) {
 	int i;
 	for (i = 0; i < manager->used; i++) {
@@ -144,6 +169,12 @@ int getSymbolLocation(const SymbolsManager* manager, const char* symbol_name) {
 	return -1; /* Indicate that the symbol was not found*/
 }
 
+/**
+ * destroySymbolsManager -
+ * Frees all allocated memory associated with the SymbolsManager.
+ *
+ * @param manager The SymbolsManager instance to destroy.
+ */
 void destroySymbolsManager(SymbolsManager* manager) {
 	int i;
 	for (i = 0; i < manager->used; i++) {
@@ -161,9 +192,20 @@ void destroySymbolsManager(SymbolsManager* manager) {
 	free(manager);
 }
 
+/**
+ * addExtEnt - 
+ * Adds a symbol to the external or entry symbol lists in the SymbolsManager.
+ *
+ * @param manager Pointer to the SymbolsManager structure which manages the symbol lists.
+ * @param value The symbol to be added to the symbol list.
+ * @param is_ext Flag indicating whether the symbol is an external symbol (if true) or an entry symbol (if false).
+ *
+ */
 void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 	if (is_ext) {
+		/* Handle addition of an external symbol*/
 		if (isRefExtSymbolExists(manager, value)) {
+			/*symbol already exists*/
 			LOG_ERROR("symbol already exists");
 			manager->has_symbols_errors = FOUND;
 		}
@@ -182,6 +224,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 				}
 				manager->ext = new_ext;
 			}
+			/* Duplicate the symbol value and add it to the external symbols array*/
 			manager->ext[manager->ext_used] = duplicate_string(value); /* Make a copy of the string*/
 			if (manager->ext[manager->ext_used] == NULL) {
 				perror("Failed to duplicate value");
@@ -196,13 +239,17 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 
 	}
 	else {
+		/* Handle addition of an entry symbol*/
 		if (isRefEntSymbolExists(manager, value)) {
+			/*symbol already exists*/
 			LOG_ERROR("symbol already exists");
 			manager->has_symbols_errors = FOUND;
 		}
 		else {
 			if (manager->ent_used == manager->ent_size) {
 				char** new_ent;
+
+				/* Double the size of the entry symbols array*/
 				manager->ent_size *= 2;
 				new_ent = (char**)realloc(manager->ent, manager->ent_size * sizeof(char*));
 				if (new_ent == NULL) {
@@ -215,6 +262,8 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 				}
 				manager->ent = new_ent;
 			}
+
+			/* Duplicate the symbol value and add it to the entry symbols array*/
 			manager->ent[manager->ent_used] = duplicate_string(value); /* Make a copy of the string*/
 			if (manager->ent[manager->ent_used] == NULL) {
 				LOG_ERROR("Failed to duplicate value");
@@ -226,11 +275,22 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 			}
 			manager->ent_used++;
 		}
-
 	}
 }
 
-
+/**
+ * updateSymbolsTable - 
+ * Updates the symbols table based on the provided line of assembly code.
+ *
+ * @param macroManager Pointer to the MacroManager structure, used to check if the symbol is a macro name.
+ * @param symbolsManager Pointer to the SymbolsManager structure, used to manage symbols and symbol lists.
+ * @param line Array of strings representing a line of assembly code, where line[0] is the directive or symbol
+ *             name and line[1] is the associated value or type.
+ * @param location The current location in the assembly code, used to determine the symbol's location.
+ * @param actions Pointer to the Action structure, used to verify the validity of actions associated with symbols.
+ *
+ * @return None
+ */
 void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManager, char** line, int location, Action* actions) {
 	if (strcmp(line[0], ".extern") == 0) {
 		addExtEnt(symbolsManager, line[1], FOUND);
@@ -259,6 +319,13 @@ void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManag
 	}
 }
 
+/**
+ * printExt - 
+ * Prints the list of external symbols stored in the SymbolsManager.
+ * Used only for work, unnecessary for final work
+
+ * @param manager Pointer to the SymbolsManager structure
+ */
 void printExt(const SymbolsManager* manager) {
 	int i;
 	printf("\n\n");
@@ -271,6 +338,13 @@ void printExt(const SymbolsManager* manager) {
 	}
 }
 
+/**
+ * printEnt -
+ * Prints the list of entry symbols stored in the SymbolsManager.
+ * Used only for work, unnecessary for final work 
+ *
+ * @param manager Pointer to the SymbolsManager structure 
+ */
 void printEnt(const SymbolsManager* manager) {
 	int i;
 	printf("\n\n");
@@ -283,14 +357,37 @@ void printEnt(const SymbolsManager* manager) {
 	}
 }
 
+/**
+ * isSymbolPattern - 
+ * Checks if a given string follows the symbol pattern 
+ * 
+ * @param word The string to check. 
+ * 
+ * @return Returns `1` (true) if the string ends with a colon (`:`), indicating it follows the symbol pattern.
+ *         Returns `0` (false) if the string does not end with a colon.
+ */
 int isSymbolPattern(const char* word) {
 	return word[(strlen(word) - 1)] == ':';
 }
 
+/**
+ * isDataPattern - 
+ * Checks if a string matches ".data" or ".string".
+ *
+ * @param word The string to check.
+ * @return 1 if the string matches ".data" or ".string", otherwise 0.
+ */
 int isDataPattern(const char* word) {
 	return strcmp(word, ".data") == 0 || strcmp(word, ".string") == 0;
 }
 
+/**
+ * isReferencePattern - 
+ * Checks if a string is ".extern" or ".entry".
+ *
+ * @param word The string to check.
+ * @return 1 if the string matches ".extern" or ".entry", otherwise 0.
+ */
 int isReferencePattern(const char* word) {
 	return strcmp(word, ".extern") == 0 || strcmp(word, ".entry") == 0;
 }
@@ -337,7 +434,15 @@ int is_symbol_exists(const SymbolsManager* manager, const char* symbol_name) {
 	return NOT_FOUND; /* Indicate that the symbol was not found*/
 }
 
-/* Adding the function to add a reference symbol*/
+/**
+ * addReferenceSymbol - 
+ * Adds a reference symbol to the SymbolsManager.
+ *
+ * @param manager The SymbolsManager instance to update.
+ * @param name The name of the reference symbol.
+ * @param location The location of the reference symbol.
+ * @param type The type of the reference symbol (e.g., external or entry).
+ */
 void addReferenceSymbol(SymbolsManager* manager, const char* name, int location, int type) {
 	ReferenceSymbol* new_ref_symbols;
 	if (manager->ref_used == manager->ref_size) {
@@ -371,7 +476,13 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 	manager->ref_used++;
 }
 
-/* Adding the function to print all reference symbols*/
+/**
+ * printReferenceSymbols - 
+ * Prints the list of reference symbols.
+ * Used only for work, unnecessary for final work 
+ *
+ * @param manager The SymbolsManager instance containing the reference symbols to print.
+ */
 void printReferenceSymbols(const SymbolsManager* manager) {
 	int i;
 	printf("\n\n");
@@ -384,6 +495,14 @@ void printReferenceSymbols(const SymbolsManager* manager) {
 	}
 }
 
+/**
+ * isRefExtSymbolExists -
+ * Checks if a symbol exists in the external symbols list.
+ *
+ * @param manager The SymbolsManager instance to search within.
+ * @param symbol_name The symbol name to look for.
+ * @return `FOUND` if the symbol is found, `NOT_FOUND` if it is not found or if input is invalid.
+ */
 int isRefExtSymbolExists(const SymbolsManager* manager, const char* symbol_name) {
 	int i;
 	if (manager == NULL || symbol_name == NULL) {
@@ -398,6 +517,15 @@ int isRefExtSymbolExists(const SymbolsManager* manager, const char* symbol_name)
 
 	return NOT_FOUND; /* Return false if the symbol_name does not exist in the ext array*/
 }
+
+/**
+ * isRefEntSymbolExists -
+ * Checks if a symbol exists in the entry symbols list.
+ *
+ * @param manager The SymbolsManager instance to search within.
+ * @param symbol_name The symbol name to look for.
+ * @return `FOUND` if the symbol is found, `NOT_FOUND` if it is not found or if input is invalid.
+ */
 int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name) {
 	int i;
 
@@ -414,6 +542,18 @@ int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name)
 	return NOT_FOUND; /* Return false if the symbol_name does not exist in the ext array*/
 }
 
+/**
+ * is_valid_symbol_name - 
+ * Validates a symbol name based on predefined criteria:
+ * - It does not exceed the maximum allowed length (`MAX_SYMBOL_NAME_LENGTH`).
+ * - It is not an existing action name.
+ * - It is not a valid register name.
+ *
+ * @param manager The SymbolsManager instance (currently unused).
+ * @param symbol_name The name of the symbol to validate.
+ * @param actions The Action instance used to check for existing actions.
+ * @return `FOUND` if the symbol name is valid, `NOT_FOUND` otherwise.
+ */
 int is_valid_symbol_name(const SymbolsManager* manager, const char* symbol_name, Action* actions) {
 	if (strlen(symbol_name) > MAX_SYMBOL_NAME_LENGTH) {
 		return NOT_FOUND;

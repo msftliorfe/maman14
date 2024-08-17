@@ -35,10 +35,9 @@ int main(int argc, char** argv) {
 		return !OK;
 	}
 
-	Action actions[16];
+	Action actions[NUM_OF_ACTIONS];
 
 	intialize_actions_array(actions);
-
 
 	/*There is at least 1 file name. Start reading*/
 	while (--argc > 0)
@@ -55,15 +54,16 @@ int main(int argc, char** argv) {
 		{
 
 			/*Only if reading the file and creating the post-macro file worked, then continue*/
-			/*print_post_macro(&fileManager);*//*Use only for work, asked only to file*/
+			
+			/*print_post_macro(&fileManager);*//*Use only for work, asked only to print to file*/
 
 			if (printPostMacroToFile(*argv, &fileManager)) {
-				/*print_post_macro_to_file(&fileManager); */
-
+				
 				/*Create assemblerManager*/
 				AssemblerManager* assemblerManager = createAssemblerManager();
 				if (assemblerManager != NULL)
 				{
+					/*Create symbolsManager*/
 					SymbolsManager* symbolsManager = createSymbolsManager();
 					if (symbolsManager != NULL)
 					{
@@ -75,6 +75,7 @@ int main(int argc, char** argv) {
 						second_scan(assemblerManager, symbolsManager);
 						if (assemblerManager->has_assembler_errors == NOT_FOUND && symbolsManager->has_symbols_errors == NOT_FOUND)
 						{
+							/*Can print output files*/
 							printObjToFile(*argv, assemblerManager);
 							printReferenceSymbolsToFile(*argv, symbolsManager);
 						}

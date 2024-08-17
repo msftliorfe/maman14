@@ -1,5 +1,13 @@
 #include "number_manager.h"
 
+/**
+ * intTo12BitUnsignedString - 
+ * Converts an unsigned integer to a 12-bit binary string representation.
+ *
+ * @param num The unsigned integer to convert.
+ * @return A pointer to a null-terminated string containing the binary representation.
+ *         Returns NULL if the input number is out of range or memory allocation fails.
+ */
 char* intTo12BitUnsignedString(unsigned int num) {
 	unsigned int mask;
 	int i;
@@ -20,6 +28,14 @@ char* intTo12BitUnsignedString(unsigned int num) {
 	return binaryString;
 }
 
+/**
+ * intTo12Bit2ComplementString -
+ * Converts an integer to a 12-bit two's complement binary string representation.
+ *
+ * @param num The integer to convert.
+ * @return A pointer to a null-terminated string containing the binary representation.
+ *         Returns NULL if the input number is out of range or memory allocation fails.
+ */
 char* intTo12Bit2ComplementString(int num) {
 	int i;
 	unsigned int mask;	
@@ -40,6 +56,14 @@ char* intTo12Bit2ComplementString(int num) {
 	return binaryString;
 }
 
+/**
+ * intToThreeBitBinary -
+ * Converts an integer to a 3-bit binary string representation.
+ *
+ * @param num The integer to convert (must be between 0 and 7 inclusive).
+ * @return A pointer to a null-terminated string containing the binary representation.
+ *         Returns NULL if the input number is out of range or memory allocation fails.
+ */
 char* intToThreeBitBinary(int num) {
 	char* binaryString;
 	if (num < 0 || num > 7) {
@@ -56,6 +80,14 @@ char* intToThreeBitBinary(int num) {
 	return binaryString;
 }
 
+/**
+ * intTo4BitString -
+ * Converts an integer to a 4-bit binary string representation.
+ *
+ * @param number The integer to convert (must be between 0 and 15 inclusive).
+ * @return A pointer to a null-terminated string containing the 4-bit binary representation.
+ *         Returns NULL if the input number is out of range or memory allocation fails.
+ */
 char* intTo4BitString(int number) {
 	int i;
 	char* bitString; 
@@ -73,7 +105,14 @@ char* intTo4BitString(int number) {
 	return bitString;
 }
 
-
+/**
+ * int_to_15bit_twos_complement -
+ * Converts an integer to a 15-bit two's complement binary string representation.
+ *
+ * @param number The integer to convert (must be between -16384 and 16383 inclusive).
+ * @return A pointer to a null-terminated string containing the 15-bit two's complement representation.
+ *         Returns NULL if memory allocation fails or if the number is out of range.
+ */
 char* int_to_15bit_twos_complement(int number) {
 	char* result = (char*)malloc((WORD_SIZE_IN_BITS+1) * sizeof(char));
 	int i;
@@ -104,6 +143,13 @@ char* int_to_15bit_twos_complement(int number) {
 	return result;
 }
 
+/**
+ * calc_array_length -
+ * Calculates the number of non-null elements in a null-terminated array of strings.
+ *
+ * @param array A pointer to a null-terminated array of strings.
+ * @return The number of non-null elements in the array. Returns 0 if the input array is NULL.
+ */
 int calc_array_length(char** array) {
 	int arraySize = 0;
 	while (array[arraySize] != NULL) {
@@ -111,6 +157,15 @@ int calc_array_length(char** array) {
 	}
 	return arraySize;
 }
+
+/**
+ * bitStringToOctal -
+ * Converts a binary string to its octal representation.
+ *
+ * @param bitString A null-terminated string representing a binary number.
+ * @return A pointer to a null-terminated string containing the octal representation.
+ *         Returns NULL if memory allocation fails.
+ */
 char* bitStringToOctal(const char* bitString) {
 	unsigned int decimal = 0;
 	unsigned int octal = 0, place = 1;

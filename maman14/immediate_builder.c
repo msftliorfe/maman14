@@ -1,11 +1,22 @@
 #include "immediate_builder.h"
 
-/* Function to return a static string representation*/
+/**
+ * immediate_are - 
+ * Returns a static string representation for Immediate addressing.
+ *
+ * @return A string representing the Addressing Mode for Immediate values.
+ */
 char* immediate_are() {
 	return "100";
 }
 
-/* Function to generate a line based on a given number*/
+/**
+ * generate_immediate_line -
+ * Generates the binary code for an Immediate operand.
+ *
+ * @param num The immediate value to be encoded.
+ * @return A string representing the binary code for the immediate operand, or NULL if memory allocation fails or an error occurs.
+ */
 char* generate_immediate_line(int num) {
 	char* combinedString;
 	int combinedLength;

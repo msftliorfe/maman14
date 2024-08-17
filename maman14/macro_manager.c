@@ -1,5 +1,11 @@
 #include "macro_manager.h"
 
+/**
+ * init_macro_manager -
+ * Initializes the MacroManager structure.
+ *
+ * @param manager A pointer to the MacroManager structure to be initialized.
+ */
 void init_macro_manager(MacroManager* manager) {
 	manager->macro_count = 0;
 	manager->is_macro_context = 0;
@@ -192,7 +198,12 @@ char*** get_macro_content(MacroManager* manager, const char* macro_name) {
 	return NULL;
 }
 
-
+/**
+ * free_macro_manager -
+ * Frees all dynamically allocated memory associated with the MacroManager.
+ *
+ * @param manager A pointer to the MacroManager structure to be freed.
+ */
 void free_macro_manager(MacroManager* manager) {
 	int i, j, k;
 	for (i = 0; i < manager->macro_count; ++i) {
