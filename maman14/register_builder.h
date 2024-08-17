@@ -14,4 +14,4 @@ char* register_are();
 char* generate_single_register_line(int register_number, int is_source);
 
 char* generate_combined_register_line(int a_register_number, int b_register_number);
-#endif // REGISTER_BUILDER_H
+#endif /*REGISTER_BUILDER_H*/

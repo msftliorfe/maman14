@@ -28,7 +28,7 @@ char* get_source_operands(Action* actions, char* action_name);
 char* get_destination_operands(Action* actions, char* action_name);
 
 /* Function to get action code by action name*/
-char* get_action_code(Action* actions, char* action_name);
+int get_action_code(Action* actions, char* action_name);
 
 /* Function to get if action exists by action name*/
 int action_exists(Action* actions, char* action_name);

@@ -33,5 +33,5 @@ void free_macro_manager(MacroManager* manager);
 char*** get_macro_content(MacroManager* manager, const char* macro_name);
 int is_macro_name(MacroManager* manager, const char* name);
 
-#endif // MACRO_MANAGER_H
+#endif /*MACRO_MANAGER_H*/ 
 

@@ -18,4 +18,4 @@ typedef enum AddressingType {
 AddressingType get_addressing_type(const char* operand);
 
 
-#endif // OPERANDS_H
+#endif /*OPERANDS_H*/

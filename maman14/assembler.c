@@ -22,9 +22,9 @@ The program receives an input file containing a program written in assembly lang
 */
 int main(int argc, char** argv) {
 
-	FILE* ifp;
 	FileManager fileManager;
 	MacroManager macroManager;
+	Action actions[NUM_OF_ACTIONS];
 
 
 
@@ -35,7 +35,6 @@ int main(int argc, char** argv) {
 		return !OK;
 	}
 
-	Action actions[NUM_OF_ACTIONS];
 
 	intialize_actions_array(actions);
 

@@ -58,7 +58,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
 	char* operand_target_code;
 	char* operand_source_code;
 	char* action_code_string;
-	char* action_code;
+	int action_code;
 	/* Allocate memory for result string*/
 	char* res = malloc(WORD_SIZE_IN_BITS + 1); /* +1 for the null terminator*/
 	if (res == NULL) {
