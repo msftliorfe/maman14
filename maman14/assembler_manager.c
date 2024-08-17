@@ -79,7 +79,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 				processActionLine(actions, line + 1, assemblerManager);
 			}
 			else { /*action doesnt exists in allowed actions list*/
-				LABEL_ERROR("This action doesn't exists", line[1]);
+				label_error("first_scan", 82, "assembler_manager.c", "This action doesn't exists", line[1]);
 			}
 		}
 		/* If the pattern is an action, process the action line */
@@ -92,7 +92,8 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 		}
 		else {
 			/*Action doesn't exists*/
-			LABEL_ERROR("This action doesn't exists", line[1]);
+			label_error("first_scan", 95, "assembler_manager.c", "This action doesn't exists", line[1]);
+
 		}
 	}
 }
@@ -111,7 +112,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
  */
 void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager) {
 	int reg_dest_was_handled = NOT_FOUND;
-	
+
 	char* first_line = process_first_line(actions, line);
 	char* action_name = clone_string(line[0]);
 	char* source_operands = get_source_operands(actions, action_name);
@@ -239,7 +240,7 @@ void addDataItem(AssemblerManager* manager, int location, const char* value) {
 void addActionItem(AssemblerManager* manager, char* metadata, int location, const char* value) {
 	manager->actionItems = (Item*)realloc(manager->actionItems, (manager->actionItemCount + 1) * sizeof(Item));
 	if (manager->actionItems == NULL) {
-		LABEL_ERROR("Failed to add action item", value);
+		label_error("addActionItem", 244, "assembler_manager.c", "Failed to add action item", value);
 		manager->has_assembler_errors = FOUND;
 		return;
 	}
@@ -311,7 +312,7 @@ void printActionItems(const AssemblerManager* manager) {
 }
 
 /**
- * updateLocationDataSymbols - 
+ * updateLocationDataSymbols -
  * Updates the location information of data symbols in the SymbolsManager.
  *
  * @param symbolsManager A pointer to the SymbolsManager that manages symbol data.

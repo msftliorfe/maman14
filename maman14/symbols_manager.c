@@ -76,7 +76,7 @@ SymbolsManager* createSymbolsManager() {
 }
 
 /**
- * addSymbol - 
+ * addSymbol -
  * Adds a new symbol to the SymbolsManager if all validation checks pass.
  *
  * @param macroManager The MacroManager instance used to check if the symbol is a macro name.
@@ -92,17 +92,17 @@ void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* 
 		manager->has_symbols_errors = FOUND;
 	}
 	else if (is_macro_name(macroManager, symbol_name)) {
-		LABEL_ERROR("symbol cannot be a macro name", symbol_name);
+		label_error("addSymbol", 95, "symbols_manager.c", "symbol cannot be a macro name", symbol_name);
 		manager->has_symbols_errors = FOUND;
 
 	}
 	else if (!is_valid_symbol_name(manager, symbol_name, actions)) {
-		LABEL_ERROR("symbol isnt valid", symbol_name);
+		label_error("addSymbol", 100, "symbols_manager.c", "symbol isnt valid", symbol_name);
 		manager->has_symbols_errors = FOUND;
 
 	}
 	else if (!is_first_char_a_letter(symbol_name)) {
-		LABEL_ERROR("symbol isnt valid", symbol_name);
+		label_error("addSymbol", 105, "symbols_manager.c", "symbol isnt valid", symbol_name);
 		manager->has_symbols_errors = FOUND;
 	}
 	else {
@@ -152,7 +152,7 @@ void printSymbols(const SymbolsManager* manager) {
 }
 
 /**
- * getSymbolLocation - 
+ * getSymbolLocation -
  * Retrieves the location of a symbol by its name.
  *
  * @param manager The SymbolsManager instance containing the symbols.
@@ -193,7 +193,7 @@ void destroySymbolsManager(SymbolsManager* manager) {
 }
 
 /**
- * addExtEnt - 
+ * addExtEnt -
  * Adds a symbol to the external or entry symbol lists in the SymbolsManager.
  *
  * @param manager Pointer to the SymbolsManager structure which manages the symbol lists.
@@ -279,7 +279,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 }
 
 /**
- * updateSymbolsTable - 
+ * updateSymbolsTable -
  * Updates the symbols table based on the provided line of assembly code.
  *
  * @param macroManager Pointer to the MacroManager structure, used to check if the symbol is a macro name.
@@ -320,7 +320,7 @@ void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManag
 }
 
 /**
- * printExt - 
+ * printExt -
  * Prints the list of external symbols stored in the SymbolsManager.
  * Used only for work, unnecessary for final work
 
@@ -341,9 +341,9 @@ void printExt(const SymbolsManager* manager) {
 /**
  * printEnt -
  * Prints the list of entry symbols stored in the SymbolsManager.
- * Used only for work, unnecessary for final work 
+ * Used only for work, unnecessary for final work
  *
- * @param manager Pointer to the SymbolsManager structure 
+ * @param manager Pointer to the SymbolsManager structure
  */
 void printEnt(const SymbolsManager* manager) {
 	int i;
@@ -358,11 +358,11 @@ void printEnt(const SymbolsManager* manager) {
 }
 
 /**
- * isSymbolPattern - 
- * Checks if a given string follows the symbol pattern 
- * 
- * @param word The string to check. 
- * 
+ * isSymbolPattern -
+ * Checks if a given string follows the symbol pattern
+ *
+ * @param word The string to check.
+ *
  * @return Returns `1` (true) if the string ends with a colon (`:`), indicating it follows the symbol pattern.
  *         Returns `0` (false) if the string does not end with a colon.
  */
@@ -371,7 +371,7 @@ int isSymbolPattern(const char* word) {
 }
 
 /**
- * isDataPattern - 
+ * isDataPattern -
  * Checks if a string matches ".data" or ".string".
  *
  * @param word The string to check.
@@ -382,7 +382,7 @@ int isDataPattern(const char* word) {
 }
 
 /**
- * isReferencePattern - 
+ * isReferencePattern -
  * Checks if a string is ".extern" or ".entry".
  *
  * @param word The string to check.
@@ -435,7 +435,7 @@ int is_symbol_exists(const SymbolsManager* manager, const char* symbol_name) {
 }
 
 /**
- * addReferenceSymbol - 
+ * addReferenceSymbol -
  * Adds a reference symbol to the SymbolsManager.
  *
  * @param manager The SymbolsManager instance to update.
@@ -477,9 +477,9 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 }
 
 /**
- * printReferenceSymbols - 
+ * printReferenceSymbols -
  * Prints the list of reference symbols.
- * Used only for work, unnecessary for final work 
+ * Used only for work, unnecessary for final work
  *
  * @param manager The SymbolsManager instance containing the reference symbols to print.
  */
@@ -543,7 +543,7 @@ int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name)
 }
 
 /**
- * is_valid_symbol_name - 
+ * is_valid_symbol_name -
  * Validates a symbol name based on predefined criteria:
  * - It does not exceed the maximum allowed length (`MAX_SYMBOL_NAME_LENGTH`).
  * - It is not an existing action name.

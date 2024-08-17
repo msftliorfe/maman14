@@ -4,7 +4,7 @@
 #define OK 0
 #define LOG_ERROR(message) log_error(__func__, __LINE__, __FILE__, message)
 #define FILE_ERROR(message, file_path) file_error(__func__, __LINE__, __FILE__, message, file_path)
-#define LABEL_ERROR(message, file_path) label_error(__func__, __LINE__, __FILE__, message, file_path)
+//#define label_error(message, file_path) label_error(__func__, __LINE__, __FILE__, message, file_path)
 #define FOUND 1 /*Instead of bool true*/
 #define NOT_FOUND 0 /*Instead of bool false*/
 #define INPUT_FILE_EXTENSION ".as"

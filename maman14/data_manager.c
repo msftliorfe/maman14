@@ -1,7 +1,7 @@
 #include "data_manager.h"
 
 /**
- * handle_numbers - 
+ * handle_numbers -
  * Converts an array of number strings into an array of 15-bit two's complement representations.
  *
  * @param number_strings An array of strings where each string represents a number.
@@ -45,13 +45,14 @@ char** handle_numbers(char** number_strings) {
  */
 char** handle_strings(const char* input_string) {
 	if (!is_first_char_quotation(input_string)) {
-		LABEL_ERROR("string is not valid", input_string);
+		label_error("handle_strings", 49, "data_manager.c", "string is not valid", input_string);
+
 		return "";
 	}
 	else {
 		char* trimmed = remove_first_last(input_string);
 		if (trimmed == NULL) {
-			LABEL_ERROR("string is not valid", input_string);
+			label_error("handle_strings", 55, "assembler_manager.c", "string is not valid", input_string);
 			return "";
 		}
 		int length, i;
