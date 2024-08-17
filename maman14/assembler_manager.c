@@ -10,7 +10,7 @@ AssemblerManager* createAssemblerManager() {
 	AssemblerManager* manager = (AssemblerManager*)malloc(sizeof(AssemblerManager));
 	/*Failed to create AssemblerManager*/
 	if (manager == NULL) {
-		LOG_ERROR("Failed to create AssemblerManager");
+		log_error("createAssemblerManager", 13, "assembler_manager.c", "Failed to create AssemblerManager");
 		return;
 	}
 	/*created AssemblerManager successfully*/
@@ -217,7 +217,7 @@ void processDataLine(char** line, AssemblerManager* assemblerManager) {
 void addDataItem(AssemblerManager* manager, int location, const char* value) {
 	manager->dataItems = (Item*)realloc(manager->dataItems, (manager->dataItemCount + 1) * sizeof(Item));
 	if (manager->dataItems == NULL) {
-		LOG_ERROR("Failed to add data item");
+		log_error("addDataItem", 220, "assembler_manager.c", "Failed to add data item");
 		manager->has_assembler_errors = FOUND;
 		return;
 	}
@@ -437,7 +437,7 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	new_file_path = malloc(len);
 
 	if (new_file_path == NULL) {
-		LOG_ERROR("Failed to allocate memory");
+		log_error("printObjToFile", 440, "assembler_manager.c", "Failed to allocate memory");
 		return NOT_FOUND;
 	}
 
@@ -490,7 +490,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				new_file_path = malloc(len);
 
 				if (new_file_path == NULL) {
-					LOG_ERROR("Failed to allocate memory");
+					log_error("printReferenceSymbolsToFile", 493, "assembler_manager.c", "Failed to allocate memory");
 					return NOT_FOUND;
 				}
 
@@ -512,7 +512,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				new_file_path = malloc(len);
 
 				if (new_file_path == NULL) {
-					LOG_ERROR("Failed to allocate memory");
+					log_error("printReferenceSymbolsToFile", 515, "assembler_manager.c", "Failed to allocate memory");
 					return NOT_FOUND;
 				}
 

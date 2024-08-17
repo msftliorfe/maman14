@@ -20,7 +20,7 @@ char** handle_numbers(char** number_strings) {
 	/* Allocate memory for the result array, including space for the null terminator */
 	result = (char**)malloc((count + 1) * sizeof(char*));
 	if (result == NULL) {
-		LOG_ERROR("Memory allocation failed\n");
+		log_error("handle_numbers", 23, "data_manager.c", "Memory allocation failed");
 		return NULL;
 	}
 
@@ -63,7 +63,7 @@ char** handle_strings(const char* input_string) {
 		length = strlen(trimmed);
 		result = (char**)malloc((length + extra_length) * sizeof(char*));
 		if (result == NULL) {
-			LOG_ERROR("Memory allocation failed\n");
+			log_error("handle_strings", 66, "data_manager.c", "Memory allocation failed");
 			return NULL;
 		}
 
@@ -74,7 +74,7 @@ char** handle_strings(const char* input_string) {
 		/* Add the "000000000000000" string to the end of the result*/
 		zero_string = (char*)malloc((WORD_SIZE_IN_BITS + 1) * sizeof(char));  /* 15 "0"s + NULL terminator*/
 		if (zero_string == NULL) {
-			LOG_ERROR("Memory allocation failed");
+			log_error("handle_strings", 77, "data_manager.c", "Memory allocation failed");
 			return NULL;
 		}
 		memset(zero_string, '0', WORD_SIZE_IN_BITS);  /* Fill with "0"s*/

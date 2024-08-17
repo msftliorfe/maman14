@@ -2,7 +2,7 @@
 #define CONSTANTS_H
 
 #define OK 0
-#define LOG_ERROR(message) log_error(__func__, __LINE__, __FILE__, message)
+//#define log_error(message) log_error(__func__, __LINE__, __FILE__, message)
 //#define file_error(message, file_path) file_error(__func__, __LINE__, __FILE__, message, file_path)
 //#define label_error(message, file_path) label_error(__func__, __LINE__, __FILE__, message, file_path)
 #define FOUND 1 /*Instead of bool true*/

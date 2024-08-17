@@ -13,7 +13,7 @@ char* generate_operand_code(const char* operand) {
 	
 	/* Memory allocation failed*/
 	if (code == NULL) {
-		LOG_ERROR("Memory allocation failed");
+		log_error("generate_operand_code", 16, "first_line_builder.c", "Memory allocation failed");
 		return NULL;
 	}
 
@@ -62,7 +62,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
 	/* Allocate memory for result string*/
 	char* res = malloc(WORD_SIZE_IN_BITS + 1); /* +1 for the null terminator*/
 	if (res == NULL) {
-		LOG_ERROR("Memory allocation failed");
+		log_error("generate_first_line", 65, "first_line_builder.c", "Memory allocation failed");
 		return NULL;
 	}
 
@@ -78,7 +78,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
 	/* Generate operand source (7-10)*/
 	operand_source_code = generate_operand_code(operand_source);
 	if (operand_source_code == NULL) {
-		LOG_ERROR("operand source code error");
+		log_error("generate_first_line", 81, "first_line_builder.c", "operand source code error");
 		return NULL;
 	}
 	strcat(res, operand_source_code);
@@ -87,7 +87,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
 	/* Generate operand target (3-6)*/
 	operand_target_code = generate_operand_code(operand_target);
 	if (operand_target_code == NULL) {
-		LOG_ERROR("operand source code error");
+		log_error("generate_first_line", 90, "first_line_builder.c", "operand source code error");
 		return NULL;
 	}
 	strcat(res, operand_target_code);

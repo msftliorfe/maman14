@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	/*There isn't any file name*/
 	if (argc == 1)
 	{
-		LOG_ERROR("There isn't any file name as input");
+		log_error("main", 34, "assembler.c", "There isn't any file name as input");
 		return !OK;
 	}
 
@@ -53,11 +53,11 @@ int main(int argc, char** argv) {
 		{
 
 			/*Only if reading the file and creating the post-macro file worked, then continue*/
-			
+
 			/*print_post_macro(&fileManager);*//*Use only for work, asked only to print to file*/
 
 			if (printPostMacroToFile(*argv, &fileManager)) {
-				
+
 				/*Create assemblerManager*/
 				AssemblerManager* assemblerManager = createAssemblerManager();
 				if (assemblerManager != NULL)

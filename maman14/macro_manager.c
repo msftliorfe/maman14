@@ -43,20 +43,20 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 				macro->commands = realloc(macro->commands, (macro->row_count + 1) * sizeof(char**));
 				if (macro->commands == NULL) {
 					/* Handle allocation failure*/
-					LOG_ERROR("Memory allocation failed");
+					log_error("process_file_line", 46, "macro_manager.c", "Memory allocation failed");
 					return NULL;
 				}
 				macro->commands[macro->row_count] = malloc((input_count + 1) * sizeof(char*));
 				if (macro->commands[macro->row_count] == NULL) {
 					/* Handle allocation failure*/
-					LOG_ERROR("Memory allocation failed");
+					log_error("process_file_line", 52, "macro_manager.c", "Memory allocation failed");
 					return NULL;
 				}
 				for (j = 0; j < input_count; ++j) {
 					macro->commands[macro->row_count][j] = malloc((strlen(input[j]) + 1) * sizeof(char));
 					if (macro->commands[macro->row_count][j] == NULL) {
 						/* Handle allocation failure*/
-						LOG_ERROR("Memory allocation failed");
+						log_error("process_file_line", 60, "macro_manager.c", "Memory allocation failed");
 						return NULL;
 					}
 					strcpy(macro->commands[macro->row_count][j], input[j]);
@@ -75,7 +75,7 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 		manager->macro_names[manager->macro_count] = malloc((strlen(input[1]) + 1) * sizeof(char));
 		if (manager->macro_names[manager->macro_count] == NULL) {
 			/* Handle allocation failure*/
-			LOG_ERROR("Memory allocation failed");
+			log_error("process_file_line", 78, "macro_manager.c", "Memory allocation failed");
 			return NULL;
 		}
 		strcpy(manager->macro_names[manager->macro_count], input[1]);
@@ -91,7 +91,7 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 			char*** result = malloc((macro->row_count + 1) * sizeof(char**));
 			if (result == NULL) {
 				/* Handle allocation failure*/
-				LOG_ERROR("Memory allocation failed");
+				log_error("process_file_line", 94, "macro_manager.c", "Memory allocation failed");
 				return NULL;
 			}
 			for (j = 0; j < macro->row_count; ++j) {
@@ -102,14 +102,14 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 				result[j] = malloc((row_length + 1) * sizeof(char*));
 				if (result[j] == NULL) {
 					/* Handle allocation failure*/
-					LOG_ERROR("Memory allocation failed");
+					log_error("process_file_line", 105, "macro_manager.c", "Memory allocation failed");
 					return NULL;
 				}
 				for (k = 0; macro->commands[j][k] != NULL; ++k) {
 					result[j][k] = malloc((strlen(macro->commands[j][k]) + 1) * sizeof(char));
 					if (result[j][k] == NULL) {
 						/* Handle allocation failure*/
-						LOG_ERROR("Memory allocation failed");
+						log_error("process_file_line", 112, "macro_manager.c", "Memory allocation failed");
 						return NULL;
 					}
 					strcpy(result[j][k], macro->commands[j][k]);
@@ -125,13 +125,13 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 	/* Allocate new memory for processed_line*/
 	processed_line = malloc((input_count + 1) * sizeof(char*));
 	if (processed_line == NULL) {
-		LOG_ERROR("Memory allocation failed");
+		log_error("process_file_line", 128, "macro_manager.c", "Memory allocation failed");
 		return NULL;
 	}
 	for (i = 0; i < input_count; ++i) {
 		processed_line[i] = malloc((strlen(input[i]) + 1) * sizeof(char));
 		if (processed_line[i] == NULL) {
-			LOG_ERROR("Memory allocation failed");
+			log_error("process_file_line", 134, "macro_manager.c", "Memory allocation failed");
 			return NULL;
 		}
 		strcpy(processed_line[i], input[i]);

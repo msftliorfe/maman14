@@ -27,7 +27,7 @@ char** split_string(const char* str) {
 	char** result = (char**)malloc(initial_size * sizeof(char*));
 
 	if (result == NULL) {
-		LOG_ERROR("Memory allocation failed");
+		log_error("split_string", 30, "strings_manager.c", "Memory allocation failed");
 		return NULL;
 	}
 
@@ -43,7 +43,7 @@ char** split_string(const char* str) {
 			int len = (int)(end - start);
 			result[index] = (char*)malloc((len + 1) * sizeof(char));
 			if (result[index] == NULL) {
-				LOG_ERROR("Memory allocation failed");
+				log_error("split_string", 46, "strings_manager.c", "Memory allocation failed");
 				return NULL;
 			}
 			strncpy(result[index], start, len);
@@ -56,7 +56,7 @@ char** split_string(const char* str) {
 				initial_size *= 2;
 				temp = (char**)realloc(result, initial_size * sizeof(char*));
 				if (temp == NULL) {
-					LOG_ERROR("Memory reallocation failed");
+					log_error("split_string", 59, "strings_manager.c", "Memory allocation failed");
 					return NULL;
 				}
 				result = temp;
@@ -100,7 +100,7 @@ char* letter_to_15bit_ascii(char letter) {
 	unsigned short ascii_value;
 
 	if (result == NULL) {
-		LOG_ERROR("Failed to allocate memory");
+		log_error("letter_to_15bit_ascii", 103, "strings_manager.c", "Memory allocation failed");
 		return NULL;
 	}
 
@@ -170,7 +170,7 @@ char* remove_first_last(const char* str) {
 	/* Allocate memory for the new string*/
 	new_str = (char*)malloc(len - 1);
 	if (new_str == NULL) {
-		LOG_ERROR("Failed to allocate memory");
+		log_error("remove_first_last", 173, "strings_manager.c", "Memory allocation failed");
 		return NULL;
 	}
 

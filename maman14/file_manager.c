@@ -58,7 +58,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 	new_file_path = malloc(len);
 
 	if (new_file_path == NULL) {
-		LOG_ERROR("Failed to allocate memory");
+		log_error("input_process", 61, "file_manager.c", "Memory allocation failed");
 		return NOT_FOUND;
 	}
 
@@ -99,7 +99,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 				fileManager->post_macro = realloc(fileManager->post_macro, (fileManager->row_count + 1) * sizeof(char**));
 				if (fileManager->post_macro == NULL) {
 					/* Handle memory allocation failure */
-					LOG_ERROR("Memory allocation failed");
+					log_error("input_process", 102, "file_manager.c", "Memory allocation failed");
 					return NOT_FOUND;
 				}
 				/* Add the new row to the post_macro array */
@@ -118,7 +118,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 				fileManager->post_macro = realloc(fileManager->post_macro, (fileManager->row_count + 1) * sizeof(char**));
 				if (fileManager->post_macro == NULL) {
 					/* Handle memory allocation failure by logging an error message and exit */
-					LOG_ERROR("Memory allocation failed");
+					log_error("input_process", 121, "file_manager.c", "Memory allocation failed");
 					return NOT_FOUND;
 				}
 
@@ -216,7 +216,7 @@ int printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 
 	/*Failed to allocate memory*/
 	if (new_file_path == NULL) {
-		LOG_ERROR("Failed to allocate memory");
+		log_error("printPostMacroToFile", 219, "file_manager.c", "Memory allocation failed");
 		return NOT_FOUND;
 	}
 

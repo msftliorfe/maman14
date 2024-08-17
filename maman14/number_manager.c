@@ -119,8 +119,8 @@ char* int_to_15bit_twos_complement(int number) {
 	unsigned short twos_complement;
 
 	if (result == NULL) {
-		LOG_ERROR("Failed to allocate memory");
-		return NULL;
+		log_error("int_to_15bit_twos_complement", 122, "number_manager.c", "Memory allocation failed");
+				return NULL;
 	}
 
 	if (number < -16384 || number > 16383) {
