@@ -89,7 +89,7 @@ SymbolsManager* createSymbolsManager() {
  * @param is_data Flag indicating if the symbol is data.
  * @param actions Action instance used for additional symbol name validation.
  */
-void addSymbol(MacroManager* macroManager, SymbolsManager* manager, char* symbol_name, int symbol_location, int is_data, Action* actions,Registers* registers) {
+void addSymbol(MacroManager* macroManager, SymbolsManager* manager, char* symbol_name, int symbol_location, int is_data, Action* actions, Registers* registers) {
 	if (is_symbol_exists(manager, symbol_name)) {
 		log_error("addSymbol", 94, "symbols_manager.c", "symbol already exists");
 		manager->has_symbols_errors = FOUND;
@@ -99,7 +99,7 @@ void addSymbol(MacroManager* macroManager, SymbolsManager* manager, char* symbol
 		manager->has_symbols_errors = FOUND;
 
 	}
-	else if (!is_valid_symbol_name(manager, symbol_name, actions,registers)) {
+	else if (!is_valid_symbol_name(manager, symbol_name, actions, registers)) {
 		label_error("addSymbol", 103, "symbols_manager.c", "symbol isnt valid", symbol_name);
 		manager->has_symbols_errors = FOUND;
 
@@ -169,7 +169,8 @@ int getSymbolLocation(const SymbolsManager* manager, const char* symbol_name) {
 			return manager->array[i].symbol_location;
 		}
 	}
-	return -1; /* Indicate that the symbol was not found*/
+	log_error("getSymbolLocation", 172, "symbols_manager.c", "symbol npt found");
+	return NOT_FOUND_SYMBOL; /* Indicate that the symbol was not found*/
 }
 
 /**
@@ -313,10 +314,10 @@ void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManag
 			}
 
 			if (action_exists(actions, line[1])) {
-				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND, actions,registers);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND, actions, registers);
 			}
 			else if (strcmp(line[1], ".string") == 0 || strcmp(line[1], ".data") == 0) {
-				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND, actions,registers);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND, actions, registers);
 			}
 
 			free(symbol_name);

@@ -391,7 +391,7 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 			}
 			else { /* this is ent symbol or just symbol - find its location in symbols table*/
 				int symbol_location = getSymbolLocation(symbolsManager, actionItem->value);
-				if (symbol_location == -1) {
+				if (symbol_location == NOT_FOUND_SYMBOL) {
 					return;
 				}
 				/* Generate a direct line string representation of the symbol location*/
