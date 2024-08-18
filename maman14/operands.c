@@ -1,5 +1,19 @@
 #include "operands.h"
 
+
+
+/**
+ * initialize_operands -
+ * Initializes the register names for two sets of registers.
+ *
+ * This function sets up the names for 8 registers in two different arrays of
+ * `Registers` and `Registers_2` structures. The first set of registers are named
+ * "r0" through "r7" and stored in the `registers` array. The second set of registers
+ * are named "*r0" through "*r7" and stored in the `registers_2` array.
+ *
+ * @param registers Pointer to an array of `Registers` structures to be initialized.
+ * @param registers_2 Pointer to an array of `Registers_2` structures to be initialized.
+ */
 void initialize_operands(Registers* registers, Registers_2* registers_2) {
 	registers[0].register_name = "r0";
 	registers[1].register_name = "r1";
@@ -18,7 +32,6 @@ void initialize_operands(Registers* registers, Registers_2* registers_2) {
 	registers_2[6].register_name = "*r6";
 	registers_2[7].register_name = "*r7";
 }
-
 
 /**
  * is_valid_register -
