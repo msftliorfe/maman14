@@ -79,7 +79,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 				processActionLine(actions, line + 1, assemblerManager, registers, registers_2);
 			}
 			else { /*action doesnt exists in allowed actions list*/
-				label_error("first_scan", 82, "assembler_manager.c", "This action doesn't exists", line[1]);
+				label_error("first_scan", 82, "assembler_manager.c", "This action doesn't exists", line[0]);
 			}
 		}
 		/* If the pattern is an action, process the action line */
@@ -92,7 +92,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 		}
 		else {
 			/*Action doesn't exists*/
-			label_error("first_scan", 95, "assembler_manager.c", "This action doesn't exists", line[1]);
+			label_error("first_scan", 95, "assembler_manager.c", "This action doesn't exists", line[0]);
 
 		}
 	}
@@ -392,6 +392,7 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 			else { /* this is ent symbol or just symbol - find its location in symbols table*/
 				int symbol_location = getSymbolLocation(symbolsManager, actionItem->value);
 				if (symbol_location == NOT_FOUND_SYMBOL) {
+					symbolsManager->has_symbols_errors = FOUND;
 					return;
 				}
 				/* Generate a direct line string representation of the symbol location*/

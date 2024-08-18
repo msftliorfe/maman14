@@ -169,7 +169,7 @@ int getSymbolLocation(const SymbolsManager* manager, const char* symbol_name) {
 			return manager->array[i].symbol_location;
 		}
 	}
-	log_error("getSymbolLocation", 172, "symbols_manager.c", "symbol npt found");
+	log_error("getSymbolLocation", 172, "symbols_manager.c", "symbol not found");
 	return NOT_FOUND_SYMBOL; /* Indicate that the symbol was not found*/
 }
 
