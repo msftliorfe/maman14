@@ -261,7 +261,8 @@ int is_first_char_a_letter(const char* str) {
  * @return FOUND (1) if the first character is a double quotation mark, NOT_FOUND (0) otherwise.
  */
 int is_first_char_quotation(const char* str) {
-	if (str[0] == '"') {
+	int length = strlen(str);
+	if (str[0] == '"' && str[length - 1] == '"') {
 		return FOUND; /* Return true if the symbol_name exists in the ext array*/
 	}
 	return NOT_FOUND;

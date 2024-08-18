@@ -71,7 +71,7 @@ char** handle_strings(const char* input_string) {
 	char* zero_string;
 
 	if (!is_first_char_quotation(input_string)) {
-		label_error("handle_strings", 54, "data_manager.c", "string is not valid", input_string);
+		label_error("handle_strings", 74, "data_manager.c", "string is not valid", input_string);
 
 		return NULL;
 	}
