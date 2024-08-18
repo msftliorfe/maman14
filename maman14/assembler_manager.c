@@ -79,7 +79,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 				processActionLine(actions, line + 1, assemblerManager, registers, registers_2);
 			}
 			else { /*action doesnt exists in allowed actions list*/
-				label_error("first_scan", 82, "assembler_manager.c", "This action doesn't exists", line[0]);
+				label_error("first_scan", 82, "assembler_manager.c", "This action doesn't exists, if this is a label, please add ':' at the end", line[0]);
 			}
 		}
 		/* If the pattern is an action, process the action line */
@@ -92,7 +92,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 		}
 		else {
 			/*Action doesn't exists*/
-			label_error("first_scan", 95, "assembler_manager.c", "This action doesn't exists", line[0]);
+			label_error("first_scan", 95, "assembler_manager.c", "This action doesn't exists, if this is a label, please add ':' at the end", line[0]);
 
 		}
 	}
@@ -443,7 +443,7 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	new_file_path = malloc(len);
 
 	if (new_file_path == NULL) {
-		log_error("printObjToFile", 443, "assembler_manager.c", "Failed to allocate memory");
+		log_error("printObjToFile", 446, "assembler_manager.c", "Failed to allocate memory");
 		return;
 	}
 
@@ -451,7 +451,7 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	strcat(new_file_path, OBJECTS_FILE_EXTENSION);
 	file = fopen(new_file_path, "w");
 	if (file == NULL) {
-		file_error("printObjToFile", 451, "assembler_manager.c", "Failed to open file", new_file_path);
+		file_error("printObjToFile", 454, "assembler_manager.c", "Failed to open file", new_file_path);
 		return;
 	}
 
@@ -496,7 +496,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				new_file_path = malloc(len);
 
 				if (new_file_path == NULL) {
-					log_error("printReferenceSymbolsToFile", 496, "assembler_manager.c", "Failed to allocate memory");
+					log_error("printReferenceSymbolsToFile", 499, "assembler_manager.c", "Failed to allocate memory");
 					return;
 				}
 
@@ -504,7 +504,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				strcat(new_file_path, EXTERNALS_FILE_EXTENSION);
 				ext_file = fopen(new_file_path, "w");
 				if (ext_file == NULL) {
-					file_error("printReferenceSymbolsToFile", 504, "assembler_manager.c", "Failed to open file", new_file_path);
+					file_error("printReferenceSymbolsToFile", 507, "assembler_manager.c", "Failed to open file", new_file_path);
 					return;
 				}
 				ext_has_values = 1;
@@ -518,7 +518,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				new_file_path = malloc(len);
 
 				if (new_file_path == NULL) {
-					log_error("printReferenceSymbolsToFile", 518, "assembler_manager.c", "Failed to allocate memory");
+					log_error("printReferenceSymbolsToFile", 521, "assembler_manager.c", "Failed to allocate memory");
 					return;
 				}
 
@@ -526,7 +526,7 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				strcat(new_file_path, ENTRY_FILE_EXTENSION);
 				ent_file = fopen(new_file_path, "w");
 				if (ent_file == NULL) {
-					file_error("printReferenceSymbolsToFile", 526, "assembler_manager.c", "Failed to open file", new_file_path);
+					file_error("printReferenceSymbolsToFile", 529, "assembler_manager.c", "Failed to open file", new_file_path);
 					return;
 				}
 				ent_has_values = 1;

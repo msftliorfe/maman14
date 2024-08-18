@@ -169,7 +169,7 @@ int getSymbolLocation(const SymbolsManager* manager, const char* symbol_name) {
 			return manager->array[i].symbol_location;
 		}
 	}
-	log_error("getSymbolLocation", 172, "symbols_manager.c", "symbol not found");
+	log_error("getSymbolLocation", 172, "symbols_manager.c", "symbol not found, valid symbold are 'r0-r7'");
 	return NOT_FOUND_SYMBOL; /* Indicate that the symbol was not found*/
 }
 
@@ -210,7 +210,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 		/* Handle addition of an external symbol*/
 		if (isRefExtSymbolExists(manager, value)) {
 			/*symbol already exists*/
-			log_error("addExtEnt", 212, "symbols_manager.c", "symbol already exists");
+			log_error("addExtEnt", 213, "symbols_manager.c", "symbol already exists");
 			manager->has_symbols_errors = FOUND;
 		}
 		else {
@@ -219,7 +219,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 				manager->ext_size *= 2;
 				new_ext = (char**)realloc(manager->ext, manager->ext_size * sizeof(char*));
 				if (new_ext == NULL) {
-					log_error("addExtEnt", 221, "symbols_manager.c", "Failed to reallocate memory for ext array");
+					log_error("addExtEnt", 222, "symbols_manager.c", "Failed to reallocate memory for ext array");
 					free(manager->ext);
 					free(manager->array);
 					free(manager->ent);
@@ -231,7 +231,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 			/* Duplicate the symbol value and add it to the external symbols array*/
 			manager->ext[manager->ext_used] = duplicate_string(value); /* Make a copy of the string*/
 			if (manager->ext[manager->ext_used] == NULL) {
-				log_error("addExtEnt", 233, "symbols_manager.c", "Failed to duplicate value");
+				log_error("addExtEnt", 234, "symbols_manager.c", "Failed to duplicate value");
 
 				free(manager->ext);
 				free(manager->array);
@@ -247,7 +247,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 		/* Handle addition of an entry symbol*/
 		if (isRefEntSymbolExists(manager, value)) {
 			/*symbol already exists*/
-			log_error("addExtEnt", 248, "symbols_manager.c", "symbol already exists");
+			log_error("addExtEnt", 250, "symbols_manager.c", "symbol already exists");
 			manager->has_symbols_errors = FOUND;
 		}
 		else {
@@ -258,7 +258,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 				manager->ent_size *= 2;
 				new_ent = (char**)realloc(manager->ent, manager->ent_size * sizeof(char*));
 				if (new_ent == NULL) {
-					log_error("addExtEnt", 260, "symbols_manager.c", "Failed to reallocate memory for ent array");
+					log_error("addExtEnt", 261, "symbols_manager.c", "Failed to reallocate memory for ent array");
 
 					free(manager->ent);
 					free(manager->array);
@@ -272,7 +272,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 			/* Duplicate the symbol value and add it to the entry symbols array*/
 			manager->ent[manager->ent_used] = duplicate_string(value); /* Make a copy of the string*/
 			if (manager->ent[manager->ent_used] == NULL) {
-				log_error("addExtEnt", 272, "symbols_manager.c", "Failed to duplicate value");
+				log_error("addExtEnt", 275, "symbols_manager.c", "Failed to duplicate value");
 				free(manager->ent);
 				free(manager->array);
 				free(manager->ext);
@@ -308,7 +308,7 @@ void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManag
 		if (isSymbolPattern(line[0])) {
 			char* symbol_name = strtrimlast(line[0]);
 			if (symbol_name == NULL) {
-				log_error("updateSymbolsTable", 308, "symbols_manager.c", "Failed to duplicate symbol_name");
+				log_error("updateSymbolsTable", 311, "symbols_manager.c", "Failed to duplicate symbol_name");
 				symbolsManager->has_symbols_errors = FOUND;
 				return;
 			}
@@ -455,7 +455,7 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 		manager->ref_size *= 2;
 		new_ref_symbols = (ReferenceSymbol*)realloc(manager->ref_symbols, manager->ref_size * sizeof(ReferenceSymbol));
 		if (new_ref_symbols == NULL) {
-			log_error("addReferenceSymbol", 455, "symbols_manager.c", "Failed to reallocate memory for ReferenceSymbol array");
+			log_error("addReferenceSymbol", 458, "symbols_manager.c", "Failed to reallocate memory for ReferenceSymbol array");
 			manager->has_symbols_errors = FOUND;
 			free(manager->ref_symbols);
 			free(manager->ent);
@@ -468,7 +468,7 @@ void addReferenceSymbol(SymbolsManager* manager, const char* name, int location,
 	}
 	manager->ref_symbols[manager->ref_used].name = duplicate_string(name);
 	if (manager->ref_symbols[manager->ref_used].name == NULL) {
-		log_error("addReferenceSymbol", 468, "symbols_manager.c", "Failed to duplicate name");
+		log_error("addReferenceSymbol", 471, "symbols_manager.c", "Failed to duplicate name");
 
 		manager->has_symbols_errors = FOUND;
 		free(manager->ref_symbols);

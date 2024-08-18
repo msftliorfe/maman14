@@ -10,7 +10,7 @@
 char** handle_numbers(char** number_strings) {
 	char** result;
 	int count = 0;
-	int i;
+	int i, j;
 
 	/* Calculate the number of strings in the array */
 	while (number_strings[count] != NULL) {
@@ -25,7 +25,26 @@ char** handle_numbers(char** number_strings) {
 	}
 
 	for (i = 0; i < count; i++) {
-		int number = atoi(number_strings[i]);
+		char* current_string = number_strings[i];
+
+		/* Check if the first character is a '+' or '-', or a digit */
+		if (current_string[0] != '+' && current_string[0] != '-' && !isdigit(current_string[0])) {
+			log_error("handle_numbers", 31, "data_manager.c", "Invalid number format (must start with '+', '-', or a digit)");
+			free(result);
+			return NULL;
+		}
+
+		/* Check if the rest of the string contains only digits */
+		for (j = 1; current_string[j] != '\0'; j++) {
+			if (!isdigit(current_string[j])) {
+				log_error("handle_numbers", 40, "data_manager.c", "Invalid number format (must contain only digits after the optional sign)");
+				free(result);
+				return NULL;
+			}
+		}
+
+		/* Convert the string to an integer and generate its 15-bit two's complement representation */
+		int number = atoi(current_string);
 		result[i] = int_to_15bit_twos_complement(number);
 	}
 
@@ -34,6 +53,7 @@ char** handle_numbers(char** number_strings) {
 
 	return result;
 }
+
 
 /**
  * handle_strings -
@@ -61,9 +81,9 @@ char** handle_strings(const char* input_string) {
 			label_error("handle_strings", 61, "assembler_manager.c", "string is not valid", input_string);
 			return NULL;
 		}
-		
+
 		extra_length = 1;  /* Additional slot for the 15 "0"s string*/
-		
+
 
 		length = strlen(trimmed);
 		result = (char**)malloc((length + extra_length) * sizeof(char*));

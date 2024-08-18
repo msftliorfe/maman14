@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	/*There isn't any file name*/
 	if (argc == 1)
 	{
-		log_error("main", 34, "assembler.c", "There isn't any file name as input");
+		log_error("main", 36, "assembler.c", "There isn't any file name as input");
 		return !OK;
 	}
 
