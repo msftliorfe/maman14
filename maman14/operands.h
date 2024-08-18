@@ -6,7 +6,6 @@
 #include "constants.h"
 #include "error_manager.h"
 
-int is_valid_register(const char* operand);
 
 typedef enum AddressingType {
 	Direct,
@@ -15,7 +14,17 @@ typedef enum AddressingType {
 	IndirectRegister
 } AddressingType;
 
-AddressingType get_addressing_type(const char* operand);
+typedef struct {
+	char* register_name;
+} Registers;
 
+typedef struct {
+	char* register_name;
+} Registers_2;
 
+AddressingType get_addressing_type(Registers* registers, Registers_2* registers_2, const char* operand);
+
+void initialize_operands(Registers* registers, Registers_2* registers_2);
+int is_valid_register(Registers* registers, const char* operand);
+int is_valid_register_2(Registers_2* registers_2, const char* operand);
 #endif /*OPERANDS_H*/

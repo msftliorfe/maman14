@@ -41,8 +41,8 @@ typedef struct {
 
 AssemblerManager* createAssemblerManager();
 void destroyAssemblerManager(AssemblerManager* manager);
-void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager, Action* actions);
-void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager);
+void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager, Action* actions, Registers* registers, Registers_2* registers_2);
+void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager, Registers* registers, Registers_2* registers_2);
 void processDataLine(char** line, AssemblerManager* assemblerManager);
 void addDataItem(AssemblerManager* manager, int location, const char* value);
 void addActionItem(AssemblerManager* manager, char* metadata, int location, const char* value);

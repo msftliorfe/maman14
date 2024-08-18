@@ -1,16 +1,16 @@
 #include "first_line_builder.h"
 
 /**
- * generate_operand_code - 
+ * generate_operand_code -
  * Helper function to generate operand code and return it as a new string
  * Generates a 4-bit code for a given operand and returns it as a new string.
  *
  * @param operand The operand string for which the code is to be generated.
  * @return A string containing the 4-bit code for the operand, or NULL if memory allocation fails.
  */
-char* generate_operand_code(const char* operand) {
+char* generate_operand_code(Registers* registers, const char* operand) {
 	char* code = malloc(5); /* Allocate memory for the code + null terminator*/
-	
+
 	/* Memory allocation failed*/
 	if (code == NULL) {
 		log_error("generate_operand_code", 16, "first_line_builder.c", "Memory allocation failed");
@@ -28,7 +28,7 @@ char* generate_operand_code(const char* operand) {
 			strcpy(code, "0100"); /* Indirect addressing */
 			break;
 		default:
-			if (is_valid_register(operand)) {
+			if (is_valid_register(registers, operand)) {
 				strcpy(code, "1000"); /* Valid register */
 			}
 			else {
@@ -54,7 +54,7 @@ char* generate_operand_code(const char* operand) {
  * @param operand_source The source operand.
  * @return A string representing the binary code for the action line, or NULL if memory allocation fails or if any error occurs.
  */
-char* generate_first_line(Action* actions, const char* action_name, const char* operand_target, const char* operand_source) {
+char* generate_first_line(Action* actions, char* action_name, const char* operand_target, const char* operand_source, Registers* registers) {
 	char* operand_target_code;
 	char* operand_source_code;
 	char* action_code_string;
@@ -76,7 +76,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
 	free(action_code_string); /* Free the allocated memory*/
 
 	/* Generate operand source (7-10)*/
-	operand_source_code = generate_operand_code(operand_source);
+	operand_source_code = generate_operand_code(registers, operand_source);
 	if (operand_source_code == NULL) {
 		log_error("generate_first_line", 81, "first_line_builder.c", "operand source code error");
 		return NULL;
@@ -85,7 +85,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
 	free(operand_source_code); /* Free the allocated memory*/
 
 	/* Generate operand target (3-6)*/
-	operand_target_code = generate_operand_code(operand_target);
+	operand_target_code = generate_operand_code(registers, operand_target);
 	if (operand_target_code == NULL) {
 		log_error("generate_first_line", 90, "first_line_builder.c", "operand source code error");
 		return NULL;
@@ -105,7 +105,7 @@ char* generate_first_line(Action* actions, const char* action_name, const char* 
  * @param line Array of strings representing the action and its operands.
  * @return A string representing the binary code for the action line, or NULL if memory allocation fails or any error occurs.
  */
-char* process_first_line(Action* actions, const char** line) {
+char* process_first_line(Action* actions, char** line, Registers* registers) {
 	int arraySize = 0;
 
 	/*Determine the number of elements in the `line` array*/
@@ -114,13 +114,13 @@ char* process_first_line(Action* actions, const char** line) {
 	}
 	/* Check for valid number of elements and generate the appropriate binary code*/
 	if (arraySize == 1) {
-		return	generate_first_line(actions, line[0], NULL, NULL);
+		return	generate_first_line(actions, line[0], NULL, NULL, registers);
 	}
 	else if (arraySize == 2) {
-		return generate_first_line(actions, line[0], line[1], NULL);
+		return generate_first_line(actions, line[0], line[1], NULL, registers);
 	}
 	else {
-		return generate_first_line(actions, line[0], line[2], line[1]);
+		return generate_first_line(actions, line[0], line[2], line[1], registers);
 	}
 }
 

@@ -1,9 +1,24 @@
 #include "operands.h"
 
-/* Array of valid operands*/
-static const char* valid_registers[] = { "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7" };
-static const char* valid_registers_2[] = { "*r0", "*r1", "*r2", "*r3", "*r4", "*r5", "*r6", "*r7" };
-static const int num_registers = sizeof(valid_registers) / sizeof(valid_registers[0]);
+void initialize_operands(Registers* registers, Registers_2* registers_2) {
+	registers[0].register_name = "r0";
+	registers[1].register_name = "r1";
+	registers[2].register_name = "r2";
+	registers[3].register_name = "r3";
+	registers[4].register_name = "r4";
+	registers[5].register_name = "r5";
+	registers[6].register_name = "r6";
+	registers[7].register_name = "r7";
+	registers_2[0].register_name = "*r0";
+	registers_2[1].register_name = "*r1";
+	registers_2[2].register_name = "*r2";
+	registers_2[3].register_name = "*r3";
+	registers_2[4].register_name = "*r4";
+	registers_2[5].register_name = "*r5";
+	registers_2[6].register_name = "*r6";
+	registers_2[7].register_name = "*r7";
+}
+
 
 /**
  * is_valid_register -
@@ -12,10 +27,10 @@ static const int num_registers = sizeof(valid_registers) / sizeof(valid_register
  * @param operand The register name to check.
  * @return FOUND (1) if the operand is a valid register, NOT_FOUND (0) otherwise.
  */
-int is_valid_register(const char* operand) {
+int is_valid_register(Registers* registers, const char* operand) {
 	int i;
-	for (i = 0; i < num_registers; ++i) {
-		if (strcmp(valid_registers[i], operand) == 0) {
+	for (i = 0; i < NUM_OF_REGISTERS; ++i) {
+		if (strcmp(registers[i].register_name, operand) == 0) {
 			return FOUND;
 		}
 	}
@@ -29,10 +44,10 @@ int is_valid_register(const char* operand) {
  * @param operand The register name to check.
  * @return FOUND (1) if the operand is a valid register, NOT_FOUND (0) otherwise.
  */
-int is_valid_register_2(const char* operand) {
+int is_valid_register_2(Registers_2* registers_2,const char* operand) {
 	int i;
-	for (i = 0; i < num_registers; ++i) {
-		if (strcmp(valid_registers_2[i], operand) == 0) {
+	for (i = 0; i < NUM_OF_REGISTERS; ++i) {
+		if (strcmp(registers_2[i].register_name, operand) == 0) {
 			return FOUND;
 		}
 	}
@@ -46,11 +61,11 @@ int is_valid_register_2(const char* operand) {
  * @param operand The operand whose addressing type is to be determined.
  * @return The AddressingType enum value corresponding to the operand's addressing type.
  */
-AddressingType get_addressing_type(const char* operand) {
-	if (is_valid_register(operand)) {
+AddressingType get_addressing_type(Registers* registers, Registers_2* registers_2,const char* operand) {
+	if (is_valid_register(registers,operand)) {
 		return DirectRegister;
 	}
-	else if (is_valid_register_2(operand)) {
+	else if (is_valid_register_2(registers_2,operand)) {
 		return IndirectRegister;
 	}
 	else if (operand[0] == '#') {

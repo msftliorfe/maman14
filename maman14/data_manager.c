@@ -44,26 +44,31 @@ char** handle_numbers(char** number_strings) {
  *         followed by a string of 15 "0"s. Returns NULL if memory allocation fails or if the input is invalid.
  */
 char** handle_strings(const char* input_string) {
-	if (!is_first_char_quotation(input_string)) {
-		label_error("handle_strings", 49, "data_manager.c", "string is not valid", input_string);
+	int length, i;
+	char** result;
+	char* trimmed;
+	int extra_length;
+	char* zero_string;
 
-		return "";
+	if (!is_first_char_quotation(input_string)) {
+		label_error("handle_strings", 54, "data_manager.c", "string is not valid", input_string);
+
+		return NULL;
 	}
 	else {
-		char* trimmed = remove_first_last(input_string);
+		trimmed = remove_first_last(input_string);
 		if (trimmed == NULL) {
-			label_error("handle_strings", 55, "assembler_manager.c", "string is not valid", input_string);
-			return "";
+			label_error("handle_strings", 61, "assembler_manager.c", "string is not valid", input_string);
+			return NULL;
 		}
-		int length, i;
-		char** result;
-		const int extra_length = 1;  /* Additional slot for the 15 "0"s string*/
-		char* zero_string;
+		
+		extra_length = 1;  /* Additional slot for the 15 "0"s string*/
+		
 
 		length = strlen(trimmed);
 		result = (char**)malloc((length + extra_length) * sizeof(char*));
 		if (result == NULL) {
-			log_error("handle_strings", 66, "data_manager.c", "Memory allocation failed");
+			log_error("handle_strings", 71, "data_manager.c", "Memory allocation failed");
 			return NULL;
 		}
 
@@ -74,7 +79,7 @@ char** handle_strings(const char* input_string) {
 		/* Add the "000000000000000" string to the end of the result*/
 		zero_string = (char*)malloc((WORD_SIZE_IN_BITS + 1) * sizeof(char));  /* 15 "0"s + NULL terminator*/
 		if (zero_string == NULL) {
-			log_error("handle_strings", 77, "data_manager.c", "Memory allocation failed");
+			log_error("handle_strings", 82, "data_manager.c", "Memory allocation failed");
 			return NULL;
 		}
 		memset(zero_string, '0', WORD_SIZE_IN_BITS);  /* Fill with "0"s*/

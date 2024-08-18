@@ -11,7 +11,7 @@ AssemblerManager* createAssemblerManager() {
 	/*Failed to create AssemblerManager*/
 	if (manager == NULL) {
 		log_error("createAssemblerManager", 13, "assembler_manager.c", "Failed to create AssemblerManager");
-		return;
+		return NULL;
 	}
 	/*created AssemblerManager successfully*/
 	manager->IC = 0;
@@ -53,7 +53,7 @@ void destroyAssemblerManager(AssemblerManager* manager) {
  * @param symbolsManager A pointer to a SymbolsManager instance used to manage and update symbol-related information
  * based on the patterns detected in the file data.
  */
-void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager, Action* actions) {
+void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerManager* assemblerManager, SymbolsManager* symbolsManager, Action* actions, Registers* registers, Registers_2* registers_2) {
 	int i;
 	/* Iterate through each row of the file data */
 	for (i = 0; i < fileManager->row_count; ++i) {
@@ -65,18 +65,18 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 
 		/* If the pattern is a reference, update the symbol table with a reference */
 		if (isReferencePattern(line[0])) {
-			updateSymbolsTable(macroManager, symbolsManager, line, -1, actions);
+			updateSymbolsTable(macroManager, symbolsManager, line, -1, actions, registers);
 		}
 		/* If the pattern is a symbol and followed by data, update symbol table and process data */
 		else if (isSymbolPattern(line[0])) {
 			if (isDataPattern(line[1])) {
-				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->DC, actions);
+				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->DC, actions, registers);
 				processDataLine(line + 1, assemblerManager);
 			}
 			/* If the pattern is a symbol and followed by an action, update symbol table and process action */
 			else if (action_exists(actions, line[1])) {
-				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->IC, actions);
-				processActionLine(actions, line + 1, assemblerManager);
+				updateSymbolsTable(macroManager, symbolsManager, line, assemblerManager->IC, actions, registers);
+				processActionLine(actions, line + 1, assemblerManager, registers, registers_2);
 			}
 			else { /*action doesnt exists in allowed actions list*/
 				label_error("first_scan", 82, "assembler_manager.c", "This action doesn't exists", line[1]);
@@ -84,7 +84,7 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
 		}
 		/* If the pattern is an action, process the action line */
 		else if (action_exists(actions, line[0])) {
-			processActionLine(actions, line, assemblerManager);
+			processActionLine(actions, line, assemblerManager, registers, registers_2);
 		}
 		/* If the pattern is data, process the data line */
 		else if (isDataPattern(line[0])) {
@@ -110,10 +110,10 @@ void first_scan(MacroManager* macroManager, FileManager* fileManager, AssemblerM
  * @param line A double pointer to the line of assembly code being processed.
  * @param assemblerManager A pointer to the AssemblerManager that manages the assembly process.
  */
-void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager) {
+void processActionLine(Action* actions, char** line, AssemblerManager* assemblerManager, Registers* registers, Registers_2* registers_2) {
 	int reg_dest_was_handled = NOT_FOUND;
 
-	char* first_line = process_first_line(actions, line);
+	char* first_line = process_first_line(actions, line, registers);
 	char* action_name = clone_string(line[0]);
 	char* source_operands = get_source_operands(actions, action_name);
 	char* destination_operands = get_destination_operands(actions, action_name);
@@ -121,15 +121,15 @@ void processActionLine(Action* actions, char** line, AssemblerManager* assembler
 	int has_dest_operands = strcmp(destination_operands, "-1") != 0;
 	int source_reg_num, dest_reg_num, number, location_of_current_operand;
 	char* line_to_add;
-
+	AddressingType	addressing_type_dest;
 
 	addActionItem(assemblerManager, line[0], assemblerManager->IC, first_line);
 	if (has_source_operands) { /* there are source_operands for this action*/
-		AddressingType	addressing_type_source = get_addressing_type(line[1]);
+		AddressingType	addressing_type_source = get_addressing_type(registers, registers_2, line[1]);
 		if (addressing_type_source == DirectRegister || addressing_type_source == IndirectRegister) {
 			source_reg_num = addressing_type_source == DirectRegister ? line[1][1] - '0' : line[1][2] - '0';
 			if (has_dest_operands) {
-				AddressingType	addressing_type_dest = get_addressing_type(line[2]);
+				AddressingType	addressing_type_dest = get_addressing_type(registers, registers_2, line[2]);
 				if (addressing_type_dest == DirectRegister || addressing_type_dest == IndirectRegister) {
 					reg_dest_was_handled = FOUND;
 					dest_reg_num = addressing_type_dest == DirectRegister ? line[2][1] - '0' : line[2][2] - '0';
@@ -160,13 +160,15 @@ void processActionLine(Action* actions, char** line, AssemblerManager* assembler
 				addActionItem(assemblerManager, "LABEL", assemblerManager->IC, line[1]);
 				break;
 			}
-
+			case IndirectRegister:
+			case DirectRegister:
+				break;
 			}
 		}
 	}
 	if (has_dest_operands) { /* handle dest operands, but skip DirectRegister and IndirectRegister if already handled*/
 		location_of_current_operand = has_source_operands ? 2 : 1;
-		AddressingType	addressing_type_dest = get_addressing_type(line[location_of_current_operand]);
+		addressing_type_dest = get_addressing_type(registers, registers_2, line[location_of_current_operand]);
 		switch (addressing_type_dest)
 		{
 		case Immediate: {
@@ -194,11 +196,12 @@ void processActionLine(Action* actions, char** line, AssemblerManager* assembler
 
 void processDataLine(char** line, AssemblerManager* assemblerManager) {
 	char** data_lines = generateDataLine(line);
+	int count = 0;
+
 	if (data_lines == NULL) {
 		assemblerManager->has_assembler_errors = FOUND;
 		return;
 	}
-	int count = 0;
 
 	while (data_lines[count] != NULL) {
 		addDataItem(assemblerManager, assemblerManager->DC, data_lines[count]);
@@ -217,7 +220,7 @@ void processDataLine(char** line, AssemblerManager* assemblerManager) {
 void addDataItem(AssemblerManager* manager, int location, const char* value) {
 	manager->dataItems = (Item*)realloc(manager->dataItems, (manager->dataItemCount + 1) * sizeof(Item));
 	if (manager->dataItems == NULL) {
-		log_error("addDataItem", 220, "assembler_manager.c", "Failed to add data item");
+		log_error("addDataItem", 223, "assembler_manager.c", "Failed to add data item");
 		manager->has_assembler_errors = FOUND;
 		return;
 	}
@@ -240,7 +243,7 @@ void addDataItem(AssemblerManager* manager, int location, const char* value) {
 void addActionItem(AssemblerManager* manager, char* metadata, int location, const char* value) {
 	manager->actionItems = (Item*)realloc(manager->actionItems, (manager->actionItemCount + 1) * sizeof(Item));
 	if (manager->actionItems == NULL) {
-		label_error("addActionItem", 244, "assembler_manager.c", "Failed to add action item", value);
+		label_error("addActionItem", 246, "assembler_manager.c", "Failed to add action item", value);
 		manager->has_assembler_errors = FOUND;
 		return;
 	}
@@ -364,40 +367,40 @@ void second_scan(AssemblerManager* assemblerManager, SymbolsManager* symbolsMana
 
 		/* Check if the metadata indicates this action item is a label */
 		if (strcmp(actionItem->metadata, "LABEL") == 0) {
-			// Update metadata to be the value of the action item
+			/*Update metadata to be the value of the action item*/
 			actionItem->metadata = duplicate_string(actionItem->value);  /* Update metadata to be the value*/
 
 			/* Check if the value of the action item is an external symbol */
 			if (isRefExtSymbolExists(symbolsManager, actionItem->value)) {/* this is an ext label*/
-				// Convert the location to a 15-bit two's complement string
+				/*Convert the location to a 15 - bit two's complement string*/
 				char* location_str = int_to_15bit_twos_complement(1);
 				if (location_str == NULL) {
 					assemblerManager->has_assembler_errors = FOUND;
 				}
-				// Add a new reference symbol to the SymbolsManager
+				/* Add a new reference symbol to the SymbolsManager*/
 				addReferenceSymbol(symbolsManager, actionItem->value, actionItem->location, FOUND); /* add new item to ref_symbols*/
 				/* Copy the new string into the value array*/
 				strncpy(actionItem->value, location_str, sizeof(actionItem->value) - 1);
 				actionItem->value[sizeof(actionItem->value) - 1] = '\0';  /* Ensure null-termination*/
 
-				// Convert the bit string to an octal representation
+				/*Convert the bit string to an octal representation*/
 				actionItem->octal = bitStringToOctal(location_str);
 
-				// Free the dynamically allocated string
+				/*Free the dynamically allocated string*/
 				free(location_str);
 			}
 			else { /* this is ent symbol or just symbol - find its location in symbols table*/
 				int symbol_location = getSymbolLocation(symbolsManager, actionItem->value);
 
-				// Generate a direct line string representation of the symbol location
+				/* Generate a direct line string representation of the symbol location*/
 				char* location_str = generate_direct_line(symbol_location);
 				/* Copy the new string into the value array*/
 				strncpy(actionItem->value, location_str, sizeof(actionItem->value) - 1);
 
-				// Convert the bit string to an octal representation
+				/* Convert the bit string to an octal representation*/
 				actionItem->octal = bitStringToOctal(location_str);
 
-				// Free the dynamically allocated string
+				/* Free the dynamically allocated string*/
 				free(location_str);
 			}
 		}
@@ -431,21 +434,21 @@ void printObjToFile(char* file_name, const AssemblerManager* assemblerManager) {
 	int i;
 	int len;
 	char* new_file_path;
-
+	FILE* file;
 	/*Concatenate extension string to the name of the file*/
 	len = strlen(file_name) + strlen(OBJECTS_FILE_EXTENSION) + 1;
 	new_file_path = malloc(len);
 
 	if (new_file_path == NULL) {
-		log_error("printObjToFile", 440, "assembler_manager.c", "Failed to allocate memory");
-		return NOT_FOUND;
+		log_error("printObjToFile", 443, "assembler_manager.c", "Failed to allocate memory");
+		return;
 	}
 
 	strcpy(new_file_path, file_name);
 	strcat(new_file_path, OBJECTS_FILE_EXTENSION);
-	FILE* file = fopen(new_file_path, "w");
+	file = fopen(new_file_path, "w");
 	if (file == NULL) {
-		file_error("printObjToFile", 448, "assembler_manager.c", "Failed to open file", new_file_path);
+		file_error("printObjToFile", 451, "assembler_manager.c", "Failed to open file", new_file_path);
 		return;
 	}
 
@@ -480,9 +483,9 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 	int ent_has_values = NOT_FOUND;
 	int ext_has_values = NOT_FOUND;
 	int i;
-
+	ReferenceSymbol* ref_symbol;
 	for (i = 0; i < manager->ref_used; ++i) {
-		ReferenceSymbol* ref_symbol = &manager->ref_symbols[i];
+		ref_symbol = &manager->ref_symbols[i];
 		if (ref_symbol->type) {
 			if (!ext_has_values) {
 				/*Concatenate extension string to the name of the file*/
@@ -490,15 +493,15 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				new_file_path = malloc(len);
 
 				if (new_file_path == NULL) {
-					log_error("printReferenceSymbolsToFile", 493, "assembler_manager.c", "Failed to allocate memory");
-					return NOT_FOUND;
+					log_error("printReferenceSymbolsToFile", 496, "assembler_manager.c", "Failed to allocate memory");
+					return;
 				}
 
 				strcpy(new_file_path, file_name);
 				strcat(new_file_path, EXTERNALS_FILE_EXTENSION);
 				ext_file = fopen(new_file_path, "w");
 				if (ext_file == NULL) {
-					file_error("printReferenceSymbolsToFile", 501, "assembler_manager.c", "Failed to open file", new_file_path);
+					file_error("printReferenceSymbolsToFile", 504, "assembler_manager.c", "Failed to open file", new_file_path);
 					return;
 				}
 				ext_has_values = 1;
@@ -512,15 +515,15 @@ void printReferenceSymbolsToFile(char* file_name, const SymbolsManager* manager)
 				new_file_path = malloc(len);
 
 				if (new_file_path == NULL) {
-					log_error("printReferenceSymbolsToFile", 515, "assembler_manager.c", "Failed to allocate memory");
-					return NOT_FOUND;
+					log_error("printReferenceSymbolsToFile", 518, "assembler_manager.c", "Failed to allocate memory");
+					return;
 				}
 
 				strcpy(new_file_path, file_name);
 				strcat(new_file_path, ENTRY_FILE_EXTENSION);
 				ent_file = fopen(new_file_path, "w");
 				if (ent_file == NULL) {
-					file_error("printReferenceSymbolsToFile", 523, "assembler_manager.c", "Failed to open file", new_file_path);
+					file_error("printReferenceSymbolsToFile", 526, "assembler_manager.c", "Failed to open file", new_file_path);
 					return;
 				}
 				ent_has_values = 1;

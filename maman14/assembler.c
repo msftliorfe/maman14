@@ -10,7 +10,7 @@
 #include "assembler_manager.h"
 #include "constants.h"
 #include "error_manager.h"
-
+#include "operands.h"
 
 
 /*
@@ -25,6 +25,8 @@ int main(int argc, char** argv) {
 	FileManager fileManager;
 	MacroManager macroManager;
 	Action actions[NUM_OF_ACTIONS];
+	Registers* registers = (Registers*)malloc(NUM_OF_REGISTERS * sizeof(Registers));
+	Registers_2* registers_2 = (Registers_2*)malloc(NUM_OF_REGISTERS * sizeof(Registers_2));
 
 
 
@@ -37,7 +39,7 @@ int main(int argc, char** argv) {
 
 
 	intialize_actions_array(actions);
-
+	initialize_operands(registers, registers_2);
 	/*There is at least 1 file name. Start reading*/
 	while (--argc > 0)
 	{
@@ -66,7 +68,7 @@ int main(int argc, char** argv) {
 					SymbolsManager* symbolsManager = createSymbolsManager();
 					if (symbolsManager != NULL)
 					{
-						first_scan(&macroManager, &fileManager, assemblerManager, symbolsManager, actions);
+						first_scan(&macroManager, &fileManager, assemblerManager, symbolsManager, actions, registers, registers_2);
 						updateLocationDataSymbols(symbolsManager, assemblerManager);
 						updateDataItemsLocation(assemblerManager);
 

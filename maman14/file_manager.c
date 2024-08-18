@@ -52,7 +52,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 	char** split_line;
 	char line[MAX_LINE_LENGTH];
 	char* new_file_path;
-
+	FILE* file;
 	/*Concatenate extension string to the name of the file*/
 	len = strlen(file_path) + strlen(INPUT_FILE_EXTENSION) + 1;
 	new_file_path = malloc(len);
@@ -66,7 +66,7 @@ int input_process(FileManager* fileManager, MacroManager* macroManager, char* fi
 	strcat(new_file_path, INPUT_FILE_EXTENSION);
 
 	/* Open the specified file for reading*/
-	FILE* file = fopen(new_file_path, "r");
+	file = fopen(new_file_path, "r");
 	if (!file) {
 		/*Failed to open file*/
 		file_error("input_process", 72, "file_manager.c", "Failed to open file", new_file_path);
@@ -209,7 +209,7 @@ int printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 	int len;
 	int i, j, col, max_columns;
 	char* new_file_path;
-
+	FILE* file;
 	/*Concatenate extension string to the name of the file*/
 	len = strlen(file_name) + strlen(POST_MACRO_FILE_EXTENSION) + 1;
 	new_file_path = malloc(len);
@@ -224,12 +224,12 @@ int printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 	strcat(new_file_path, POST_MACRO_FILE_EXTENSION);
 
 	/*Open file to write*/
-	FILE* file = fopen(new_file_path, "w");
+	file = fopen(new_file_path, "w");
 
 	/*failed to open file*/
 	if (file == NULL) {
 		strcpy(new_file_path, file_name);
-		file_error("printPostMacroToFile", 501, "file_manager.c", "Failed to open file", new_file_path);
+		file_error("printPostMacroToFile", 232, "file_manager.c", "Failed to open file", new_file_path);
 		return NOT_FOUND;
 	}
 
@@ -238,7 +238,7 @@ int printPostMacroToFile(char* file_name, const FileManager* fileManager) {
 	/*Nothing to write*/
 	if (fileManager->row_count == 0) {
 		fprintf(file, "No data to display.\n");
-		return;
+		return FOUND;
 	}
 	/*There is data to write*/
 	/* Determine the maximum number of columns for proper formatting*/

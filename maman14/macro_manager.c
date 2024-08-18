@@ -56,7 +56,7 @@ char** process_file_line(MacroManager* manager, char** input, int input_count) {
 					macro->commands[macro->row_count][j] = malloc((strlen(input[j]) + 1) * sizeof(char));
 					if (macro->commands[macro->row_count][j] == NULL) {
 						/* Handle allocation failure*/
-						log_error("process_file_line", 60, "macro_manager.c", "Memory allocation failed");
+						log_error("process_file_line", 59, "macro_manager.c", "Memory allocation failed");
 						return NULL;
 					}
 					strcpy(macro->commands[macro->row_count][j], input[j]);

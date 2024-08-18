@@ -89,23 +89,23 @@ SymbolsManager* createSymbolsManager() {
  * @param is_data Flag indicating if the symbol is data.
  * @param actions Action instance used for additional symbol name validation.
  */
-void addSymbol(MacroManager* macroManager, SymbolsManager* manager, const char* symbol_name, int symbol_location, int is_data, Action* actions) {
+void addSymbol(MacroManager* macroManager, SymbolsManager* manager, char* symbol_name, int symbol_location, int is_data, Action* actions,Registers* registers) {
 	if (is_symbol_exists(manager, symbol_name)) {
 		log_error("addSymbol", 94, "symbols_manager.c", "symbol already exists");
 		manager->has_symbols_errors = FOUND;
 	}
 	else if (is_macro_name(macroManager, symbol_name)) {
-		label_error("addSymbol", 95, "symbols_manager.c", "symbol cannot be a macro name", symbol_name);
+		label_error("addSymbol", 98, "symbols_manager.c", "symbol cannot be a macro name", symbol_name);
 		manager->has_symbols_errors = FOUND;
 
 	}
-	else if (!is_valid_symbol_name(manager, symbol_name, actions)) {
-		label_error("addSymbol", 100, "symbols_manager.c", "symbol isnt valid", symbol_name);
+	else if (!is_valid_symbol_name(manager, symbol_name, actions,registers)) {
+		label_error("addSymbol", 103, "symbols_manager.c", "symbol isnt valid", symbol_name);
 		manager->has_symbols_errors = FOUND;
 
 	}
 	else if (!is_first_char_a_letter(symbol_name)) {
-		label_error("addSymbol", 105, "symbols_manager.c", "symbol isnt valid", symbol_name);
+		label_error("addSymbol", 108, "symbols_manager.c", "symbol isnt valid", symbol_name);
 		manager->has_symbols_errors = FOUND;
 	}
 	else {
@@ -230,7 +230,8 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 			/* Duplicate the symbol value and add it to the external symbols array*/
 			manager->ext[manager->ext_used] = duplicate_string(value); /* Make a copy of the string*/
 			if (manager->ext[manager->ext_used] == NULL) {
-				perror("Failed to duplicate value");
+				log_error("addExtEnt", 233, "symbols_manager.c", "Failed to duplicate value");
+
 				free(manager->ext);
 				free(manager->array);
 				free(manager->ent);
@@ -256,7 +257,8 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
 				manager->ent_size *= 2;
 				new_ent = (char**)realloc(manager->ent, manager->ent_size * sizeof(char*));
 				if (new_ent == NULL) {
-					perror("Failed to reallocate memory for ent array");
+					log_error("addExtEnt", 260, "symbols_manager.c", "Failed to reallocate memory for ent array");
+
 					free(manager->ent);
 					free(manager->array);
 					free(manager->ext);
@@ -294,7 +296,7 @@ void addExtEnt(SymbolsManager* manager, const char* value, int is_ext) {
  *
  * @return None
  */
-void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManager, char** line, int location, Action* actions) {
+void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManager, char** line, int location, Action* actions, Registers* registers) {
 	if (strcmp(line[0], ".extern") == 0) {
 		addExtEnt(symbolsManager, line[1], FOUND);
 	}
@@ -311,10 +313,10 @@ void updateSymbolsTable(MacroManager* macroManager, SymbolsManager* symbolsManag
 			}
 
 			if (action_exists(actions, line[1])) {
-				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND, actions);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, NOT_FOUND, actions,registers);
 			}
 			else if (strcmp(line[1], ".string") == 0 || strcmp(line[1], ".data") == 0) {
-				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND, actions);
+				addSymbol(macroManager, symbolsManager, symbol_name, location, FOUND, actions,registers);
 			}
 
 			free(symbol_name);
@@ -558,7 +560,7 @@ int isRefEntSymbolExists(const SymbolsManager* manager, const char* symbol_name)
  * @param actions The Action instance used to check for existing actions.
  * @return `FOUND` if the symbol name is valid, `NOT_FOUND` otherwise.
  */
-int is_valid_symbol_name(const SymbolsManager* manager, char* symbol_name, Action* actions) {
+int is_valid_symbol_name(const SymbolsManager* manager, char* symbol_name, Action* actions, Registers* registers) {
 	if (strlen(symbol_name) > MAX_SYMBOL_NAME_LENGTH) {
 		return NOT_FOUND;
 	}
@@ -566,7 +568,7 @@ int is_valid_symbol_name(const SymbolsManager* manager, char* symbol_name, Actio
 	if (action_exists(actions, symbol_name)) {
 		return NOT_FOUND;
 	}
-	if (is_valid_register(symbol_name)) {
+	if (is_valid_register(registers, symbol_name)) {
 		return NOT_FOUND;
 	}
 	return FOUND;
